@@ -8,4 +8,5 @@ rule all:
 
 
 include: "rules/common.smk"
+include: "rules/bwa_mem.smk"
 include: "rules/other.smk"
