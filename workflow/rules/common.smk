@@ -23,14 +23,21 @@ validate(units, schema="../schemas/units.schema.yaml")
 
 report: "../report/workflow.rst"
 
-##### wildcard constraints #####
+##### test space #####
+#u = units.loc[ ('net-037', '1'), ["fq1", "fq2"] ].dropna()
+#print(u)
+#print([ f"{u.fq1}", f"{u.fq2}" ])
+#print("|".join(samples.index))
+#print("|".join(units["unit"]))
 
-#wildcard_constraints:
-#    sample = "|".join(samples.index),
-#    unit = "|".join(units["unit"])
+##### wildcard constraints #####
+wildcard_constraints:
+    sample = "|".join(samples.index),
+    unit = "|".join(units["unit"])
 
 ####### helpers ###########
 def get_fastqs(wildcards):
     """Get raw FASTQ files from unit sheet."""
+    print("hello world")
     u = units.loc[ (wildcards.sample, wildcards.unit), ["fq1", "fq2"] ].dropna()
     return [ f"{u.fq1}", f"{u.fq2}" ]

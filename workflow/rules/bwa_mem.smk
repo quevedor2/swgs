@@ -1,6 +1,6 @@
 rule bwa_mem:
   input:
-    config['bwa']['index']
+    config['bwa']['index'],
     get_fastqs
   output:
     "alignment/mapped_reads/{sample}.bam"
