@@ -1,0 +1,4 @@
+.snakemake
+workflow/.snakemake
+data
+alignment
