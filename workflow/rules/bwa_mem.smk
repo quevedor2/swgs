@@ -15,6 +15,8 @@ rule bwa_mem:
 rule samtools_index:
   input:
     "alignment/mapped_reads/{sample}.bam"
+  output:
+    "alignment/mapped_reads/{sample}.bam.bai"
   conda:
     "../envs/bwa.yaml"
   shell:
