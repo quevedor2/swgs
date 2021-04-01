@@ -38,7 +38,18 @@ wildcard_constraints:
 ####### helpers ###########
 def get_fastqs(wildcards):
     """Get raw FASTQ files from unit sheet."""
-    print("hello world")
     #u = units.loc[ (wildcards.sample, wildcards.unit), ["fq1", "fq2"] ].dropna()
     u = units.loc[ (wildcards.sample, '1'), ["fq1", "fq2"] ].dropna()
     return [ f"{u.fq1}", f"{u.fq2}" ]
+
+def get_rgid(wildcards):
+    """ Files in a raw @RG header for bwa mem alignment """
+    dat = units.loc[ (wildcards.sample, '1'), ['platform', 'library'] ].dropna()
+    rg=("@RG" + 
+        "\tID:" + wildcards.sample + 
+        "\tSM:" + wildcards.sample +
+        "\tPL:" + f"{dat.platform}" + 
+        "\tPU:L001" + 
+        "\tLB:" + f"{dat.library}")
+    return [ f"{rg}" ]
+

@@ -7,10 +7,12 @@ rule bwa_mem:
   conda:
     "../envs/bwa.yaml"
   threads: 4
+  params: 
+    rgid=get_rgid
   shell:
-    "bwa mem {input} | "
+    "bwa mem -R {params.rgid} {input} | "
     "samtools view -bhS - | "
-    "samtools sort -@4 - "
+    "samtools sort -@4 - > {output}"
 
 rule samtools_index:
   input:
