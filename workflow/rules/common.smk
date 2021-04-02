@@ -24,10 +24,10 @@ validate(units, schema="../schemas/units.schema.yaml")
 report: "../report/workflow.rst"
 
 ##### test space #####
-u = units.loc[ ('net-037', '1'), ["fq1", "fq2"] ].dropna()
+#u = units.loc[ ('net-037', '1'), ["fq1", "fq2"] ].dropna()
 #print(u)
-print([ f"{u.fq1}", f"{u.fq2}" ])
-print("|".join(samples.index))
+#print([ f"{u.fq1}", f"{u.fq2}" ])
+#print("|".join(samples.index))
 #print("|".join(units["unit"]))
 
 ##### wildcard constraints #####

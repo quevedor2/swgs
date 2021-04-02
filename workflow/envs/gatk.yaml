@@ -3,8 +3,7 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - r ==3.6.1
-  - picard ==2.18.7
-  - gatk ==4.2.0.0
+  - picard ==2.22.1
+  - snakemake-wrapper-utils ==0.1.3
 
   

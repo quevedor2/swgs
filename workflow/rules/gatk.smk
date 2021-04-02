@@ -1,15 +1,14 @@
 rule mark_duplicates:
   input:
-    "alignment/mapped_reads/{sample}.bam"
+    "alignment/mapped_reads/{sample}.sorted.bam"
   output:
-    out="alignment/mapped_reads/{sample}.dup.bam",
-    metrics="alignment/mapped_reads/{sample}.dup_metric.txt"
-  conda:
-    "../envs/gatk.yaml"
-  threads: 4
-  shell:
-    "picard MarkDuplicates "
-    "ASSUME_SORTED=TRUE "
-    "INPUT={input} "
-    "METRICS_FILE={output.metrics} "
-    "OUTPUT={output.out} "
+    bam="alignment/dedup/{sample}.bam",
+    metrics="alignment/dedup/{sample}.metric.txt"
+  log:
+    "logs/picard/dedup/{sample}.log"
+  threads: 8
+  params:
+    "REMOVE_DUPLICATES=true",
+    "ASSUME_SORT_ORDER='coordinate'"
+  wrapper:
+    "0.73.0/bio/picard/markduplicates"
