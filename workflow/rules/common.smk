@@ -6,14 +6,16 @@ import pandas as pd
 container: "docker://continuumio/miniconda3"
 
 ##### load config and sample sheets #####
-
+# Config file
 configfile: "config/config.yaml"
 validate(config, schema="../schemas/config.schema.yaml")
 
+# Samples: List of samples and conditions
 samples = pd.read_csv(config["samples"], sep="\t").set_index("sample", drop=False)
 samples.index.names = ["sample_id"]
 validate(samples, schema="../schemas/samples.schema.yaml")
 
+# List of sample+unit information (e.g. paths, builds, etc.)
 units = pd.read_csv(
     config["units"], dtype=str, sep="\t").set_index(["sample", "unit"], drop=False)
 units.index.names = ["sample_id", "unit_id"]
@@ -42,14 +44,21 @@ def get_fastqs(wildcards):
     u = units.loc[ (wildcards.sample, '1'), ["fq1", "fq2"] ].dropna()
     return [ f"{u.fq1}", f"{u.fq2}" ]
 
+def get_indel_paths(wildcards):
+    ''' Assembles the paths for snp/indels for indel realignment'''
+    if config['common']['build'] == 'hg19':
+        known = list(config['indel_realigner_hg19'].values())
+    else if config['common']['build'] == 'hg38':
+        known = list(config['indel_realigner_hg38'].values())
+    return f"{known}"
+
 def get_rgid(wildcards):
     """ Files in a raw @RG header for bwa mem alignment """
     dat = units.loc[ (wildcards.sample, '1'), ['platform', 'library'] ].dropna()
-    rg=("@RG" + 
-        "\tID:" + wildcards.sample + 
+    rg=("@RG" +
+        "\tID:" + wildcards.sample +
         "\tSM:" + wildcards.sample +
-        "\tPL:" + f"{dat.platform}" + 
-        "\tPU:L001" + 
+        "\tPL:" + f"{dat.platform}" +
+        "\tPU:L001" +
         "\tLB:" + f"{dat.library}")
     return [ f"{rg}" ]
-

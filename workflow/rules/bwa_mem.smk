@@ -6,11 +6,11 @@ rule bwa_mem:
   log:
     "logs/bwa_mem/{sample}.log"
   threads: 8
-  params: 
-    index=config['bwa']['index'],
+  params:
+    index=config['common']['genome'],
     extra=r"-R '@RG\tID:{sample}\tSM:{sample}'",
     sort="samtools",
-    sort_order="coordinate"    
+    sort_order="coordinate"
   wrapper:
     "0.73.0/bio/bwa/mem"
 
