@@ -4,11 +4,12 @@
 
 include: "rules/common.smk"
 include: "rules/bwa_mem.smk"
+include: "rules/gatk.smk"
 include: "rules/other.smk"
 
 rule all:
     input:
-      "alignment/mapped_reads/net-037.bam.bai"
+      "alignment/dedup/net-037.bam"
 #    input: all_input
         # The first rule should define the default target files
         # Subsequent target rules can be specified below. They should start with all_*.
