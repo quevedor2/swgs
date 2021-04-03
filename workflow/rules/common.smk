@@ -44,12 +44,11 @@ def get_fastqs(wildcards):
     u = units.loc[ (wildcards.sample, '1'), ["fq1", "fq2"] ].dropna()
     return [ f"{u.fq1}", f"{u.fq2}" ]
 
-def get_indel_paths(wildcards):
+def get_variant_paths(wildcards, variant):
     ''' Assembles the paths for snp/indels for indel realignment'''
-    if config['common']['build'] == 'hg19':
-        known = list(config['gatk']['indel_realigner_hg19'].values())
-    elif config['common']['build'] == 'hg38':
-        known = list(config['gatk']['indel_realigner_hg38'].values())
+    var_build = variant + "_" + config['common']['build']
+    print(var_build)
+    known = list(config['gatk'][var_build].values())
     return known
 
 def get_rgid(wildcards):

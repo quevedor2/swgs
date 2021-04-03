@@ -13,7 +13,7 @@ rule mark_duplicates:
   wrapper:
     "0.73.0/bio/picard/markduplicates"
 
-rule samtools_index2:
+rule index_duplicates:
   input:
     "alignment/dedup/{sample}.bam"
   output:
@@ -26,9 +26,9 @@ rule samtools_index2:
 rule realigner_target_creator:
     input:
         bam="alignment/dedup/{sample}.bam",
-        bai=rules.samtools_index2.output,
+        bai=rules.index_duplicates.output,
         ref=config['common']['genome'],
-        known=get_indel_paths,
+        known=get_variant_paths(variant='indel'),
     output:
         intervals="alignment/realign/{sample}.intervals",
         java_temp=temp(directory("gatk3_indelrealigner/{sample}")),
@@ -47,7 +47,7 @@ rule indelrealigner:
         bam="alignment/dedup/{sample}.bam",
         bai="alignment/dedup/{sample}.bam.bai",
         ref=config['common']['genome'],
-        known=get_indel_paths,
+        known=get_variant_paths(variant='indel'),
         target_intervals="alignment/realign/{sample}.intervals"
     output:
         bam="alignment/realign/{sample}.bam",
@@ -62,3 +62,39 @@ rule indelrealigner:
         mem_mb = 8192
     wrapper:
         "0.73.0/bio/gatk3/indelrealigner"
+
+rule baserecalibrator:
+    input:
+        bam="alignment/realign/{sample}.bam",
+        ref=config['common']['genome'],
+        known=get_variant_paths(variant='snp')
+    output:
+        "alignment/recal/{sample}.recal_data_table"
+    log:
+        "logs/gatk/bqsr/{sample}.log"
+    params:
+        **config["params"]["gatk"]["baserecalibrator"],
+        extra=""  # optional
+    resources:
+        mem_mb = 8192
+    threads: 8
+    wrapper:
+        "0.73.0/bio/gatk3/baserecalibrator"
+
+rule printreads:
+    input:
+        bam="alignment/realign/{sample}.bam",
+        ref=config['common']['genome'],
+        recal_data="alignment/recal/{sample}.recal_data_table"
+    output:
+        "alignment/recal/{sample}.bqsr.bam"
+    log:
+        "logs/gatk/bqsr/{sample}.log"
+    params:
+        **config["params"]["gatk"]["printreads"],
+        extra=""  # optional
+    resources:
+        mem_mb = 8192
+    threads: 8
+    wrapper:
+        "0.73.0/bio/gatk3/printreads"
