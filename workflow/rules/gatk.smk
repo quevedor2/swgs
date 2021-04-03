@@ -45,7 +45,7 @@ rule realigner_target_creator:
 rule indelrealigner:
     input:
         bam="alignment/dedup/{sample}.bam",
-        bai="alignment/dedup/{sample}.bai",
+        bai="alignment/dedup/{sample}.bam.bai",
         ref=config['common']['genome'],
         known=get_indel_paths,
         target_intervals="alignment/realign/{sample}.intervals"
@@ -54,11 +54,11 @@ rule indelrealigner:
         bai="alignment/realign/{sample}.bai",
         java_temp=temp(directory("/tmp/gatk3_indelrealigner/{sample}")),
     log:
-        "logs/gatk3/indelrealigner/{sample}.log"
+        "logs/gatk/indelrealigner/{sample}.log"
     params:
         extra=""  # optional
     threads: 8
     resources:
         mem_mb = 8192
     wrapper:
-        "0.73.0/bio/gatk/indelrealigner"
+        "0.73.0/bio/gatk3/indelrealigner"
