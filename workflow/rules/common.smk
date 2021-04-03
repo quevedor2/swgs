@@ -49,7 +49,7 @@ def get_indel_paths(wildcards):
     if config['common']['build'] == 'hg19':
         known = list(config['gatk']['indel_realigner_hg19'].values())
     elif config['common']['build'] == 'hg38':
-        known = list(confi['gatk']['indel_realigner_hg38'].values())
+        known = list(config['gatk']['indel_realigner_hg38'].values())
     return known
 
 def get_rgid(wildcards):

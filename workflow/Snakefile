@@ -9,7 +9,8 @@ include: "rules/other.smk"
 
 rule all:
     input:
-      "alignment/realign/net-037.intervals"
+      rules.indelrealigner.output
+      #"alignment/realign/net-037.intervals"
 #    input: all_input
         # The first rule should define the default target files
         # Subsequent target rules can be specified below. They should start with all_*.
