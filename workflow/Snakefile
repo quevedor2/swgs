@@ -9,8 +9,7 @@ include: "rules/other.smk"
 
 rule all:
     input:
-      "alignment/realign/net-037.bai",
-      "alignment/realign/net-037.bam"
+      "alignment/recal/net-037.bqsr.bam"
       #rules.indelrealigner.output
 #    input: all_input
         # The first rule should define the default target files

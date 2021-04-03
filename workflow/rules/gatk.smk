@@ -28,7 +28,7 @@ rule realigner_target_creator:
         bam="alignment/dedup/{sample}.bam",
         bai=rules.index_duplicates.output,
         ref=config['common']['genome'],
-        known=get_variant_paths(variant='indel'),
+        known=get_snp_paths
     output:
         intervals="alignment/realign/{sample}.intervals",
         java_temp=temp(directory("gatk3_indelrealigner/{sample}")),
@@ -47,7 +47,7 @@ rule indelrealigner:
         bam="alignment/dedup/{sample}.bam",
         bai="alignment/dedup/{sample}.bam.bai",
         ref=config['common']['genome'],
-        known=get_variant_paths(variant='indel'),
+        known=get_indel_paths,
         target_intervals="alignment/realign/{sample}.intervals"
     output:
         bam="alignment/realign/{sample}.bam",
@@ -67,14 +67,13 @@ rule baserecalibrator:
     input:
         bam="alignment/realign/{sample}.bam",
         ref=config['common']['genome'],
-        known=get_variant_paths(variant='snp')
+        known=get_indel_paths
     output:
         "alignment/recal/{sample}.recal_data_table"
     log:
-        "logs/gatk/bqsr/{sample}.log"
+        "logs/gatk/bqsr/{sample}.log",
     params:
-        **config["params"]["gatk"]["baserecalibrator"],
-        extra=""  # optional
+        extra=combine_args(config["params"]["gatk"]["baserecalibrator"]),
     resources:
         mem_mb = 8192
     threads: 8
@@ -91,8 +90,7 @@ rule printreads:
     log:
         "logs/gatk/bqsr/{sample}.log"
     params:
-        **config["params"]["gatk"]["printreads"],
-        extra=""  # optional
+        extra=combine_args(config["params"]["gatk"]["printreads"]),
     resources:
         mem_mb = 8192
     threads: 8

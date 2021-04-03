@@ -44,20 +44,32 @@ def get_fastqs(wildcards):
     u = units.loc[ (wildcards.sample, '1'), ["fq1", "fq2"] ].dropna()
     return [ f"{u.fq1}", f"{u.fq2}" ]
 
-def get_variant_paths(wildcards, variant):
+def get_snp_paths(wildcards):
     ''' Assembles the paths for snp/indels for indel realignment'''
-    var_build = variant + "_" + config['common']['build']
+    var_build = "snp_" + config['common']['build']
     print(var_build)
     known = list(config['params']['gatk'][var_build].values())
     return known
+
+def get_indel_paths(wildcards):
+    ''' Assembles the paths for snp/indels for indel realignment'''
+    var_build = "indel_" + config['common']['build']
+    print(var_build)
+    known = list(config['params']['gatk'][var_build].values())
+    return known
+
+def combine_args(input_args):
+    format_args = " ".join(input_args)
+    return format_args
 
 def get_rgid(wildcards):
     """ Files in a raw @RG header for bwa mem alignment """
     dat = units.loc[ (wildcards.sample, '1'), ['platform', 'library'] ].dropna()
     rg=("@RG" +
-        "\tID:" + wildcards.sample +
-        "\tSM:" + wildcards.sample +
-        "\tPL:" + f"{dat.platform}" +
-        "\tPU:L001" +
-        "\tLB:" + f"{dat.library}")
-    return [ f"{rg}" ]
+        "\\tID:" + wildcards.sample +
+        "\\tSM:" + wildcards.sample +
+        "\\tPL:" + f"{dat.platform}" +
+        "\\tPU:L001" +
+        "\\tLB:" + f"{dat.library}")
+    rg = "-R '" + rg + "'"
+    return f"{rg}"

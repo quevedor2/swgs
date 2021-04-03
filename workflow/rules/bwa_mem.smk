@@ -7,8 +7,8 @@ rule bwa_mem:
     "logs/bwa_mem/{sample}.log"
   threads: 8
   params:
-    index=config['common']['genome'],
-    extra=r"-R '@RG\tID:{sample}\tSM:{sample}'",
+    index=config['params']['bwa']['mem']['genome'],
+    extra=get_rgid,
     sort="samtools",
     sort_order="coordinate"
   wrapper:
