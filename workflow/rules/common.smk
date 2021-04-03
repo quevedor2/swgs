@@ -47,10 +47,10 @@ def get_fastqs(wildcards):
 def get_indel_paths(wildcards):
     ''' Assembles the paths for snp/indels for indel realignment'''
     if config['common']['build'] == 'hg19':
-        known = list(config['indel_realigner_hg19'].values())
-    else if config['common']['build'] == 'hg38':
-        known = list(config['indel_realigner_hg38'].values())
-    return f"{known}"
+        known = list(config['gatk']['indel_realigner_hg19'].values())
+    elif config['common']['build'] == 'hg38':
+        known = list(confi['gatk']['indel_realigner_hg38'].values())
+    return known
 
 def get_rgid(wildcards):
     """ Files in a raw @RG header for bwa mem alignment """

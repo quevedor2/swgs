@@ -6,7 +6,7 @@ units: "config/units.tsv"
 
 common:
   build: 'hg19'
-  genome: '/mnt/work1/data/genomes/human/hg19/iGenomes/Sequence/BWAIndex/genome.fa'
+  genome: '/mnt/work1/data/genomes/human/hg19/iGenomes/Sequence/WholeGenomeFasta/genome.fa'
     
 gatk:
   indel_realigner_hg19:

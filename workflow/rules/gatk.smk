@@ -13,9 +13,20 @@ rule mark_duplicates:
   wrapper:
     "0.73.0/bio/picard/markduplicates"
 
+rule samtools_index2:
+  input:
+    "alignment/dedup/{sample}.bam"
+  output:
+    "alignment/dedup/{sample}.bam.bai"
+  log:
+    "logs/samtools/index/{sample}.log"
+  wrapper:
+    "0.73.0/bio/samtools/index"
+
 rule realigner_target_creator:
     input:
         bam="alignment/dedup/{sample}.bam",
+        bai=rules.samtools_index2.output,
         ref=config['common']['genome'],
         known=get_indel_paths,
     output:
@@ -26,7 +37,7 @@ rule realigner_target_creator:
     params:
         extra="", # optional
     resources:
-        mem_mb=1024,
+        mem_mb=8192,
     threads: 8
     wrapper:
         "0.73.0/bio/gatk3/realignertargetcreator"

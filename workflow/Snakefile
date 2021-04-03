@@ -9,7 +9,7 @@ include: "rules/other.smk"
 
 rule all:
     input:
-      "alignment/dedup/net-037.bam"
+      "alignment/realign/net-037.intervals"
 #    input: all_input
         # The first rule should define the default target files
         # Subsequent target rules can be specified below. They should start with all_*.
