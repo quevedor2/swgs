@@ -48,7 +48,7 @@ def get_variant_paths(wildcards, variant):
     ''' Assembles the paths for snp/indels for indel realignment'''
     var_build = variant + "_" + config['common']['build']
     print(var_build)
-    known = list(config['gatk'][var_build].values())
+    known = list(config['params']['gatk'][var_build].values())
     return known
 
 def get_rgid(wildcards):
