@@ -1,8 +1,6 @@
-log = snakemake.log_fmt_shell(stdout=False, stderr=True)
-
 rule collect_multiple_metrics:
     input:
-         bam="alignment/recal/{sample}.bqsr.bam",
+         bam="results/alignment/recal/{sample}.bqsr.bam",
          ref=config['common']['genome']
     output:
         multiext("qc/{sample}",
@@ -30,16 +28,16 @@ rule collect_multiple_metrics:
 
 rule collect_wgs_metrics:
     input:
-        bam="alignment/recal/{sample}.bqsr.bam",
+        bam="results/alignment/recal/{sample}.bqsr.bam",
         ref=config['common']['genome'],
     output:
         "results/qc/{sample}.wgs_metrics"
     log:
-        "logs/picard/multiple_metrics/{sample}.log"
-    env:
-        "envs/picard.yaml"
-    wrapper:
-        "(picard CollectWgsMetrics "
+        "logs/picard/wgs_metrics/{sample}.log"
+    conda:
+        "../envs/picard.yaml"
+    shell:
+        "picard CollectWgsMetrics "
         "I={input.bam} "
         "O={output} "
-        "R={input.ref}) {log}"
+        "R={input.ref} 2> {log}"
