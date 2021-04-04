@@ -71,7 +71,7 @@ rule baserecalibrator:
     output:
         "alignment/recal/{sample}.recal_data_table"
     log:
-        "logs/gatk/bqsr/{sample}.log",
+        "logs/gatk/bqsr/{sample}.recal.log",
     params:
         extra=combine_args(config["params"]["gatk"]["baserecalibrator"]),
     resources:
@@ -88,7 +88,7 @@ rule printreads:
     output:
         "alignment/recal/{sample}.bqsr.bam"
     log:
-        "logs/gatk/bqsr/{sample}.log"
+        "logs/gatk/bqsr/{sample}.print.log"
     params:
         extra=combine_args(config["params"]["gatk"]["printreads"]),
     resources:
