@@ -5,6 +5,7 @@
 include: "rules/common.smk"
 include: "rules/bwa_mem.smk"
 include: "rules/gatk.smk"
+include: "rules/qc.smk"
 include: "rules/other.smk"
 
 rule all:
