@@ -41,3 +41,15 @@ rule collect_wgs_metrics:
         "I={input.bam} "
         "O={output} "
         "R={input.ref} 2> {log}"
+
+rule plot_wgs_insert:
+    input:
+        qcdir="results/qc"
+    output:
+        "results/plots/qc/wgs_insert_metrics.pdf"
+    conda:
+        "../envs/picard.yaml"
+    shell:
+        "Rscript ../scripts/plot-picard_metrics.R "
+        "--qcdir {input} "
+        "--output {output}"

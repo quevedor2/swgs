@@ -10,10 +10,7 @@ include: "rules/other.smk"
 
 rule all:
     input:
-      "results/qc/net-001a.wgs_metrics",
-      "results/qc/net-001b.wgs_metrics",
-      "results/qc/net-002.wgs_metrics",
-      "results/qc/net-037.wgs_metrics"
+      "results/plots/qc/wgs_insert_metrics.pdf",
       #rules.indelrealigner.output
 #    input: all_input
         # The first rule should define the default target files
