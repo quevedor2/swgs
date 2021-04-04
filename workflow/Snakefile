@@ -10,6 +10,9 @@ include: "rules/other.smk"
 
 rule all:
     input:
+      "qc/net-001a.quality_yield_metrics",
+      "qc/net-001b.quality_yield_metrics",
+      "qc/net-002.quality_yield_metrics",
       "qc/net-037.quality_yield_metrics"
       #rules.indelrealigner.output
 #    input: all_input
