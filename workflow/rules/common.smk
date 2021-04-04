@@ -59,6 +59,7 @@ def get_indel_paths(wildcards):
     return known
 
 def get_samples():
+    print(samples.index.tolist())
     return samples.index.tolist()
 
 def combine_args(input_args):

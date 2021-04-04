@@ -45,13 +45,16 @@ rule collect_wgs_metrics:
 rule plot_wgs_insert:
     input:
         qcdir="results/qc",
-        samples=",".get_samples,
+        wgsfiles=expand("results/qc/{sample}.wgs_metrics", sample=samples.index),
+        insertfiles=expand("results/qc/{sample}.insert_size_metrics", sample=samples.index)
     output:
         "results/plots/qc/wgs_insert_metrics.pdf"
+    params:
+        samples=",".join(expand("{sample}", sample=samples.index)),
     conda:
         "../envs/r.yaml"
     shell:
         "Rscript workflow/scripts/plot_picard_metrics.R "
         "--qcdir {input.qcdir} "
-        "--samples {input.samples} "
+        "--samples {params.samples} "
         "--output {output}"
