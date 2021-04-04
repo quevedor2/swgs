@@ -48,8 +48,8 @@ rule plot_wgs_insert:
     output:
         "results/plots/qc/wgs_insert_metrics.pdf"
     conda:
-        "../envs/picard.yaml"
+        "../envs/r.yaml"
     shell:
-        "Rscript ../scripts/plot-picard_metrics.R "
+        "Rscript workflow/scripts/plot_picard_metrics.R "
         "--qcdir {input} "
         "--output {output}"

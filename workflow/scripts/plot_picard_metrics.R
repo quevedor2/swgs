@@ -62,7 +62,7 @@ par(mar=c(6.1,4.1, 1, 2.1))
 pct_col <- c("#7fc97f", "#beaed4", "#fdc086", "#ffff99", "#386cb0")
 pct <- c("PCT_EXC_MAPQ", "PCT_EXC_DUPE", "PCT_EXC_UNPAIRED",
          "PCT_EXC_BASEQ", "PCT_EXC_OVERLAP")
-barplot(t(wgs_df[,pct]), col=pct_col, cex.names=0.5,
+barplot(t(wgs_df[,pct]), col=pct_col, cex.names=0.75,
         ylim=c(0, getMaxY(wgs_df[,pct])), las=2,
         ylab="Fraction of filtered aligned bases")
 legend("topright", fill=pct_col, cex=1,
