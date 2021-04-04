@@ -1,9 +1,9 @@
 rule mark_duplicates:
   input:
-    "alignment/mapped_reads/{sample}.sorted.bam"
+    "results/alignment/mapped_reads/{sample}.sorted.bam"
   output:
-    bam="alignment/dedup/{sample}.bam",
-    metrics="alignment/dedup/{sample}.metric.txt"
+    bam="results/alignment/dedup/{sample}.bam",
+    metrics="results/alignment/dedup/{sample}.metric.txt"
   log:
     "logs/picard/dedup/{sample}.log"
   threads: 8
@@ -15,9 +15,9 @@ rule mark_duplicates:
 
 rule index_duplicates:
   input:
-    "alignment/dedup/{sample}.bam"
+    "results/alignment/dedup/{sample}.bam"
   output:
-    "alignment/dedup/{sample}.bam.bai"
+    "results/alignment/dedup/{sample}.bam.bai"
   log:
     "logs/samtools/index/{sample}.log"
   wrapper:
@@ -25,12 +25,12 @@ rule index_duplicates:
 
 rule realigner_target_creator:
     input:
-        bam="alignment/dedup/{sample}.bam",
+        bam="results/alignment/dedup/{sample}.bam",
         bai=rules.index_duplicates.output,
         ref=config['common']['genome'],
         known=get_snp_paths
     output:
-        intervals="alignment/realign/{sample}.intervals",
+        intervals="results/alignment/realign/{sample}.intervals",
         java_temp=temp(directory("gatk3_indelrealigner/{sample}")),
     log:
         "logs/gatk/indelrealigner/{sample}.realignertargetcreator.log",
@@ -44,14 +44,14 @@ rule realigner_target_creator:
 
 rule indelrealigner:
     input:
-        bam="alignment/dedup/{sample}.bam",
-        bai="alignment/dedup/{sample}.bam.bai",
+        bam="results/alignment/dedup/{sample}.bam",
+        bai="results/alignment/dedup/{sample}.bam.bai",
         ref=config['common']['genome'],
         known=get_indel_paths,
-        target_intervals="alignment/realign/{sample}.intervals"
+        target_intervals="results/alignment/realign/{sample}.intervals"
     output:
-        bam="alignment/realign/{sample}.bam",
-        bai="alignment/realign/{sample}.bai",
+        bam="results/alignment/realign/{sample}.bam",
+        bai="results/alignment/realign/{sample}.bai",
         java_temp=temp(directory("/tmp/gatk3_indelrealigner/{sample}")),
     log:
         "logs/gatk/indelrealigner/{sample}.log"
@@ -65,11 +65,11 @@ rule indelrealigner:
 
 rule baserecalibrator:
     input:
-        bam="alignment/realign/{sample}.bam",
+        bam="results/alignment/realign/{sample}.bam",
         ref=config['common']['genome'],
         known=get_indel_paths
     output:
-        "alignment/recal/{sample}.recal_data_table"
+        "results/alignment/recal/{sample}.recal_data_table"
     log:
         "logs/gatk/bqsr/{sample}.recal.log",
     params:
@@ -82,11 +82,11 @@ rule baserecalibrator:
 
 rule printreads:
     input:
-        bam="alignment/realign/{sample}.bam",
+        bam="results/alignment/realign/{sample}.bam",
         ref=config['common']['genome'],
-        recal_data="alignment/recal/{sample}.recal_data_table"
+        recal_data="results/alignment/recal/{sample}.recal_data_table"
     output:
-        "alignment/recal/{sample}.bqsr.bam"
+        "results/alignment/recal/{sample}.bqsr.bam"
     log:
         "logs/gatk/bqsr/{sample}.print.log"
     params:
