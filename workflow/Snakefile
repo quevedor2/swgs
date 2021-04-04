@@ -10,7 +10,7 @@ include: "rules/other.smk"
 
 rule all:
     input:
-      "alignment/recal/net-037.bqsr.bam"
+      "qc/net-037.quality_yield_metrics"
       #rules.indelrealigner.output
 #    input: all_input
         # The first rule should define the default target files

@@ -3,3 +3,5 @@ workflow/.snakemake
 data
 alignment
 logs
+qc
+report.html
