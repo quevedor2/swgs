@@ -1,3 +1,5 @@
+log = snakemake.log_fmt_shell(stdout=False, stderr=True)
+
 rule collect_multiple_metrics:
     input:
          bam="alignment/recal/{sample}.bqsr.bam",
@@ -25,3 +27,19 @@ rule collect_multiple_metrics:
         "METRIC_ACCUMULATION_LEVEL=SAMPLE "
     wrapper:
         "0.73.0/bio/picard/collectmultiplemetrics"
+
+rule collect_wgs_metrics:
+    input:
+        bam="alignment/recal/{sample}.bqsr.bam",
+        ref=config['common']['genome'],
+    output:
+        "results/qc/{sample}.wgs_metrics"
+    log:
+        "logs/picard/multiple_metrics/{sample}.log"
+    env:
+        "envs/picard.yaml"
+    wrapper:
+        "(picard CollectWgsMetrics "
+        "I={input.bam} "
+        "O={output} "
+        "R={input.ref}) {log}"
