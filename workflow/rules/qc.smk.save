@@ -44,14 +44,13 @@ rule collect_wgs_metrics:
 
 rule plot_wgs_insert:
     input:
-        qcdir="results/qc",
-        samples=",".join(expand("{sample}", sample=config['samples'])),
+        qcdir="results/qc"
     output:
+        report("fig1_qc-picard.svg", caption="report/fig1.rst", category="Step 1"),
         "results/plots/qc/wgs_insert_metrics.pdf"
     conda:
         "../envs/r.yaml"
     shell:
         "Rscript workflow/scripts/plot_picard_metrics.R "
-        "--qcdir {input.qcdir} "
-        "--samples {input.samples} "
+        "--qcdir {input} "
         "--output {output}"

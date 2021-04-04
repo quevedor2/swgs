@@ -8,11 +8,14 @@ option_list <- list(
   make_option(c("-q", "--qcdir"), type="character", default='results/qc',
               help="Directory containining picard metric files [default=%default]"),
   make_option(c("-o", "--output"), type="character", default='picard_qc.pdf',
-              help="File name and path to output file [default=%default]")
+              help="File name and path to output file [default=%default]"),
+  make_option(c("-s", "--samples"), type="character", default='all',
+              help="Comma-separated list of samples to plot [default=%default]")
 )
 opt <- parse_args(OptionParser(option_list=option_list))
 qcdir <- opt$qcdir
 out_pdf <- opt$output
+samples <- opt$samples
 
 ##########################
 #### Helper Functions ####
@@ -32,7 +35,15 @@ getMaxY <- function(x, range_y=c(0.1, 0.5, 1, 2, 5, 10, 50, 500, 1000)){
 #### List and read all files ####
 wgs_files     <- list.files(qcdir, pattern="wgs_metrics")         # CollectWgsMetrics
 insert_files  <- list.files(qcdir, pattern="insert_size_metrics") # CollectInsertSizeMetrics
-samples <- gsub(".wgs_metrics$", "", wgs_files)
+if(samples=='all'){
+  samples     <- gsub(".wgs_metrics$", "", wgs_files)
+} else {
+  samples     <- strsplit(samples, split=",")[[1]]
+  idx         <- match(samples, gsub(".wgs_metrics", "", wgs_files))
+  wgs_files   <- wgs_files[idx]
+  insert_files <- insert_files[idx]
+}
+
 
 wgs_df    <- do.call(rbind, lapply(file.path(qcdir, wgs_files), readPicardFile))
 insert_df <- do.call(rbind, lapply(file.path(qcdir, insert_files), readPicardFile))
