@@ -45,7 +45,7 @@ rule collect_wgs_metrics:
 rule plot_wgs_insert:
     input:
         qcdir="results/qc",
-        samples=",".join(expand("{sample}", sample=config['samples'])),
+        samples=",".get_samples,
     output:
         "results/plots/qc/wgs_insert_metrics.pdf"
     conda:

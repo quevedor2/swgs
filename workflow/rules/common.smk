@@ -58,6 +58,9 @@ def get_indel_paths(wildcards):
     known = list(config['params']['gatk'][var_build].values())
     return known
 
+def get_samples():
+    return samples.index.tolist()
+
 def combine_args(input_args):
     format_args = " ".join(input_args)
     return format_args
