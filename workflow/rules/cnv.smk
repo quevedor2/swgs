@@ -37,7 +37,6 @@ rule readcounter:
         "sed \"s/chrom=chr/chrom=/\" "
         "> {output} 2> {log}"
 
-'''
 rule ichorcna:
     input:
         bam="results/alignment/recal/{sample}.bqsr.bam",
@@ -49,8 +48,42 @@ rule ichorcna:
     conda:
         "../envs/r.yaml"
     shell:
-        "picard CollectWgsMetrics "
-        "I={input.bam} "
-        "O={output} "
-        "R={input.ref} 2> {log}"
-'''
+        "runIchorCNA.R "
+        "--WIG {input.wig} "
+        "--NORMWIG {params.normalWig} "
+        "--gcWig {params.gc_wig} "
+        "--mapWig {params.mapWig} "
+        "--normalPanel {params.normal_panel} "
+        "--exons.bed {params.exons_bed} "
+        "--id {params.outputFileNamePrefix} "
+        "--centromere {params.centromere} "
+        "--minMapScore {params.min_map_score} "
+        "--rmCentromereFlankLength {params.rmCentromereFlankLength} "
+        "--normal {params.normal} "
+        "--scStates {params.scStates} "
+        "--coverage {params.coverage} "
+        "--lambda {params.lambda} "
+        "--lambdaScaleHyperParam {params.lambdaScaleHyperParam} "
+        "--ploidy {params.ploidy} "
+        "--maxCN {params.maxCN} "
+        "true="--estimateNormal True" false="--estimateNormal False" estimateNormal} \
+        "true="--estimateScPrevalence True" false="--estimateScPrevalence  False" estimateScPrevalence} \
+        "true="--estimatePloidy True" false="--estimatePloidy False" estimatePloidy} \
+        "--maxFracCNASubclone {params.maxFracCNASubclone} "
+        "--maxFracGenomeSubclone {params.maxFracGenomeSubclone} "
+        "--minSegmentBins {params.minSegmentBins} "
+        "--altFracThreshold {params.altFracThreshold} "
+        "--chrNormalize {params.chrNormalize} "
+        "--chrTrain {params.chrTrain} "
+        "--chrs "c(~{sep="," chrs})" "
+        "--genomeBuild {params.genomeBuild} "
+        "--genomeStyle {params.genomeStyle} "
+        "true="--normalizeMaleX True" false="--normalizeMaleX False" normalizeMaleX} \
+        "--fracReadsInChrYForMale " + fracReadsInChrYForMale} \
+        "true="--includeHOMD True" false="--includeHOMD False" includeHOMD} \
+        "--txnE {params.txnE} "
+        "--txnStrength {params.txnStrength} "
+        "--plotFileType {params.plotFileType} "
+        "--plotYLim {params.plotYLim} "
+        "--libdir {params.libdir} "
+        "--outDir {output} "
