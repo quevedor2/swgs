@@ -18,6 +18,7 @@ rule get_chromosomes:
 rule readcounter:
     input:
         bam="results/alignment/recal/{sample}.bqsr.bam",
+        bai="results/alignment/recal/{sample}.bqsr.bam.bai",
         chrs="results/cnv/ichorcna/{sample}.chrs",
     output:
         "results/cnv/ichorcna/{sample}.wig",
@@ -32,7 +33,7 @@ rule readcounter:
         "readCounter "
         "--window {params.window} "
         "--quality {params.quality} "
-        "--chromosomes $(cat <<< {input.chrs}) "
+        "--chromosome $(cat {input.chrs}) "
         "{input.bam} | "
         "sed \"s/chrom=chr/chrom=/\" "
         "> {output} 2> {log}"
