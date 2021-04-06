@@ -42,3 +42,17 @@ params:
   readcounter:
     window: 1000000
     quality: 20
+  ichorcna:
+    ploidy: "c(2,3)"
+    normal: "c(0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9)"
+    maxCN: 5
+    include_HOMD: True
+    estimateNormal: True
+    estimatePloidy: True
+    estimateScPrevalence: True
+    sc_states: "c(1,3)"
+    txnE: 0.9999
+    txn_strength: 10000
+    
+    
+    

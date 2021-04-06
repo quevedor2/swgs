@@ -1,5 +1,6 @@
 from snakemake.utils import validate
 import pandas as pd
+import re
 
 # this container defines the underlying OS for each job when using the workflow
 # with --use-conda --use-singularity
@@ -77,3 +78,42 @@ def get_rgid(wildcards):
         "\\tLB:" + f"{dat.library}")
     rg = "-R '" + rg + "'"
     return f"{rg}"
+
+def get_ichorPath(rlib_path):
+    extdata  = rlib_path + "/ichorCNA/extdata/"
+    
+    # Setup centromere file name (e.g. GRCh37 instead of hg19)
+    if config['common']['build'] == 'hg19':
+        cen_file = 'GRCh37.p13_centromere_UCSC-gapTable.txt'
+    elif config['common']['build'] == 'hg38':
+        cen_file = 'GRCh38.GCA_000001405.2_centromere_acen.txt'
+        #cen_file = 'cytoBand_hg38'
+    
+    # Get the 500kb or 1Mb window annotation
+    window_size = config['params']['readcounter']['window']
+    window_size = int(window_size / 1000)       # size in kb
+    if window_size >= 1000:
+        window_size_simple = str(int(window_size / 1000)) + "Mb"
+    else:
+        window_size_simple = str(window_size) + "kb"
+    
+    # assemble wig file prefix
+    # Expected Format: [gc/map]_[hg19/hg38]_[window_size]kb.wig
+    wig_file = "_" + config['common']['build'] + "_" + str(window_size) + "kb.wig"
+    normal_file = "HD_ULP_PoN_" + window_size_simple + "_median_normAutosome_mapScoreFiltered_median.rds"
+    map_path    = extdata + "map" + wig_file
+    gc_path     = extdata + "gc" + gc_file
+    cen_path    = extdata + cen_file
+    normal_path = extdata + normal_file
+    return {"map":map_path, "gc"=gc_path, "cen"=cen_path, "norm"=normal_path}
+
+def get_ichorChrs(chr_path):
+    chr_path = "net-002.chrs"
+    file=open(chr_path, mode='r',newline="\n")
+    chrs = file.read()
+    
+    chrs        = re.sub("chr", "", chrs)
+    chr_train   = "c(" + re.sub(",X.*\\n$", "", chrs) + ")"
+    chrs        = "c(" + re.sub(",Y.*\\n$", "", chrs) + ")"
+    
+    return {"all":chrs, "train":chr_train}

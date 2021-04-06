@@ -38,53 +38,86 @@ rule readcounter:
         "sed \"s/chrom=chr/chrom=/\" "
         "> {output} 2> {log}"
 
-rule ichorcna:
-    input:
-        bam="results/alignment/recal/{sample}.bqsr.bam",
-        ref=config['common']['genome'],
+rule get_RlibPath:
     output:
-        "results/cnv/{sample}.ichor"
-    log:
-        "logs/picard/wgs_metrics/{sample}.log"
+        "results/cnv/ichorcna/libpath"
     conda:
         "../envs/r.yaml"
     shell:
+        "Rscript -e \"cat(.libPaths(), '\n')\" > {output}"
+
+rule ichorcna:
+    input:
+        bam="results/alignment/recal/{sample}.bqsr.bam",
+        rlib="results/cnv/ichorcna/libpath",
+        chrs="results/cnv/ichorcna/{sample}.chrs",
+        ref=config['common']['genome'],
+    output:
+        dir="results/cnv/ichorcna/{sample}",
+        file="results/cnv/ichorcna/{sample}/{sample}_tpdf.pdf",
+    log:
+        "logs/cnv/ichorcna/{sample}.log"
+    conda:
+        "../envs/r.yaml"
+    params:
+        wig: "None",
+        ploidy: config['params']['ichorcna']['ploidy'],
+        normal: config['params']['ichorcna']['normal'],
+        maxCN: config['params']['ichorcna']['maxCN'],
+        gc_wig: get_ichorPath({input.rlib})['gc'],
+        map_wig: get_ichorPath({input.rlib})['map'],
+        centromere: get_ichorPath({input.rlib})['cen'],
+        normal_panel: get_ichorPath({input.rlib})['norm'],
+        include_HOMD: config['params']['ichorcna']['include_HOMD'],
+        chrs: get_ichorChrs({input.chrs})['all'],
+        chr_train: get_ichorChrs({input.chrs})['train'],
+        estimateNormal: config['params']['ichorcna']['estimateNormal'],
+        estimatePloidy: config['params']['ichorcna']['estimatePloidy'],
+        estimateScPrevalence: config['params']['ichorcna']['estimateScPrevalence'],
+        sc_states: config['params']['ichorcna']['sc_states'],
+        txnE: config['params']['ichorcna']['txnE'],
+        txn_strength: config['params']['ichorcna']['txn_strength'],
+        sc_states: config['params']['ichorcna']['sc_states'],
+    shell:
         "runIchorCNA.R "
+        "--id {wildcards.sample} "
         "--WIG {input.wig} "
+        "--ploidy '{params.ploidy}' "
+        "--normal '{params.normal}' "
+        "--maxCN {params.maxCN} "
+        "--gcWig '{params.gc_wig}' "
+        "--mapWig '{params.map_wig}' "
+        "--centromere '{params.centromere}' "
+        "--normalPanel '{params.normal_panel}' "
+        "--includeHOMD {params.HOMD} "
+        "--chrs '{params.chrs}' "
+        "--chrTrain '{params.chrTrain}' "
+        "--estimateNormal {params.estimateNormal} "
+        "--estimatePloidy {params.estimatePloidy} "
+        "--estimateScPrevalence {params.estimateScPrevalence} "
+        "--scStates '{params.sc_states}' "
+        "--txnE {params.txnE} "
+        "--txnStrength {params.txn_strength} "
+        "--outDir '{output}'"
+
+'''
         "--NORMWIG {params.normalWig} "
-        "--gcWig {params.gc_wig} "
-        "--mapWig {params.mapWig} "
-        "--normalPanel {params.normal_panel} "
         "--exons.bed {params.exons_bed} "
-        "--id {params.outputFileNamePrefix} "
-        "--centromere {params.centromere} "
         "--minMapScore {params.min_map_score} "
         "--rmCentromereFlankLength {params.rmCentromereFlankLength} "
-        "--normal {params.normal} "
-        "--scStates {params.scStates} "
         "--coverage {params.coverage} "
         "--lambda {params.lambda} "
         "--lambdaScaleHyperParam {params.lambdaScaleHyperParam} "
-        "--ploidy {params.ploidy} "
-        "--maxCN {params.maxCN} "
-        "true="--estimateNormal True" false="--estimateNormal False" estimateNormal} \
-        "true="--estimateScPrevalence True" false="--estimateScPrevalence  False" estimateScPrevalence} \
-        "true="--estimatePloidy True" false="--estimatePloidy False" estimatePloidy} \
         "--maxFracCNASubclone {params.maxFracCNASubclone} "
         "--maxFracGenomeSubclone {params.maxFracGenomeSubclone} "
         "--minSegmentBins {params.minSegmentBins} "
         "--altFracThreshold {params.altFracThreshold} "
         "--chrNormalize {params.chrNormalize} "
-        "--chrTrain {params.chrTrain} "
-        "--chrs "c(~{sep="," chrs})" "
         "--genomeBuild {params.genomeBuild} "
         "--genomeStyle {params.genomeStyle} "
-        "true="--normalizeMaleX True" false="--normalizeMaleX False" normalizeMaleX} \
-        "--fracReadsInChrYForMale " + fracReadsInChrYForMale} \
-        "true="--includeHOMD True" false="--includeHOMD False" includeHOMD} \
-        "--txnE {params.txnE} "
-        "--txnStrength {params.txnStrength} "
+        "--normalizeMaleX {params.normalizeMalX} "
+        "--fracReadsInChrYForMale {params.fracReadsInChrYForMale} "
         "--plotFileType {params.plotFileType} "
         "--plotYLim {params.plotYLim} "
         "--libdir {params.libdir} "
-        "--outDir {output} "
+'''
