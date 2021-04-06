@@ -49,8 +49,9 @@ rule get_RlibPath:
 rule ichorcna:
     input:
         bam="results/alignment/recal/{sample}.bqsr.bam",
-        rlib="results/cnv/ichorcna/libpath",
-        chrs="results/cnv/ichorcna/{sample}.chrs",
+        wig="results/cnv/ichorcna/{sample}.wig",
+        rlib=rules.get_RlibPath.output,
+        chrs=rules.get_chromosomes.output,
         ref=config['common']['genome'],
     output:
         dir="results/cnv/ichorcna/{sample}",
@@ -60,24 +61,24 @@ rule ichorcna:
     conda:
         "../envs/r.yaml"
     params:
-        wig: "None",
-        ploidy: config['params']['ichorcna']['ploidy'],
-        normal: config['params']['ichorcna']['normal'],
-        maxCN: config['params']['ichorcna']['maxCN'],
-        gc_wig: get_ichorPath({input.rlib})['gc'],
-        map_wig: get_ichorPath({input.rlib})['map'],
-        centromere: get_ichorPath({input.rlib})['cen'],
-        normal_panel: get_ichorPath({input.rlib})['norm'],
-        include_HOMD: config['params']['ichorcna']['include_HOMD'],
-        chrs: get_ichorChrs({input.chrs})['all'],
-        chr_train: get_ichorChrs({input.chrs})['train'],
-        estimateNormal: config['params']['ichorcna']['estimateNormal'],
-        estimatePloidy: config['params']['ichorcna']['estimatePloidy'],
-        estimateScPrevalence: config['params']['ichorcna']['estimateScPrevalence'],
-        sc_states: config['params']['ichorcna']['sc_states'],
-        txnE: config['params']['ichorcna']['txnE'],
-        txn_strength: config['params']['ichorcna']['txn_strength'],
-        sc_states: config['params']['ichorcna']['sc_states'],
+        ploidy=config['params']['ichorcna']['ploidy'],
+        normal=config['params']['ichorcna']['normal'],
+        maxCN=config['params']['ichorcna']['maxCN'],
+        gc_wig=get_ichorPath(rules.get_RlibPath.output)['gc'],
+        map_wig=get_ichorPath(rules.get_RlibPath.output)['map'],
+        centromere=get_ichorPath(rules.get_RlibPath.output)['cen'],
+        normal_panel=get_ichorPath(rules.get_RlibPath.output)['norm'],
+        HOMD=config['params']['ichorcna']['include_HOMD'],
+        chrs=lambda w, input: get_ichorChrs(input[3].format(sample=w.sample))['all'],
+        chr_train=lambda w, input: get_ichorChrs(input[3].format(sample=w.sample))['train'],
+        estimateNormal=config['params']['ichorcna']['estimateNormal'],
+        estimatePloidy=config['params']['ichorcna']['estimatePloidy'],
+        estimateScPrevalence=config['params']['ichorcna']['estimateScPrevalence'],
+        sc_states=config['params']['ichorcna']['sc_states'],
+        txnE=config['params']['ichorcna']['txnE'],
+        txn_strength=config['params']['ichorcna']['txn_strength'],
+        genome_style=config['params']['ichorcna']['genome_style'],
+        genome_build=config['common']['build'],
     shell:
         "runIchorCNA.R "
         "--id {wildcards.sample} "
@@ -91,16 +92,18 @@ rule ichorcna:
         "--normalPanel '{params.normal_panel}' "
         "--includeHOMD {params.HOMD} "
         "--chrs '{params.chrs}' "
-        "--chrTrain '{params.chrTrain}' "
+        "--chrTrain '{params.chr_train}' "
         "--estimateNormal {params.estimateNormal} "
         "--estimatePloidy {params.estimatePloidy} "
         "--estimateScPrevalence {params.estimateScPrevalence} "
         "--scStates '{params.sc_states}' "
         "--txnE {params.txnE} "
         "--txnStrength {params.txn_strength} "
-        "--outDir '{output}'"
+        "--genomeStyle {params.genome_style} "
+        "--outDir '{output.dir}' 2> {log}"
 
 '''
+        "--genomeBuild {params.genome_build} "
         "--NORMWIG {params.normalWig} "
         "--exons.bed {params.exons_bed} "
         "--minMapScore {params.min_map_score} "

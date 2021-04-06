@@ -80,7 +80,11 @@ def get_rgid(wildcards):
     return f"{rg}"
 
 def get_ichorPath(rlib_path):
-    extdata  = rlib_path + "/ichorCNA/extdata/"
+    print(str(rlib_path))
+    file=open(str(rlib_path), mode='r',newline="\n")
+    rlib_path = file.read()
+    print(str(rlib_path))
+    extdata  = str(rlib_path).rstrip() + "/ichorCNA/extdata/"
     
     # Setup centromere file name (e.g. GRCh37 instead of hg19)
     if config['common']['build'] == 'hg19':
@@ -102,18 +106,19 @@ def get_ichorPath(rlib_path):
     wig_file = "_" + config['common']['build'] + "_" + str(window_size) + "kb.wig"
     normal_file = "HD_ULP_PoN_" + window_size_simple + "_median_normAutosome_mapScoreFiltered_median.rds"
     map_path    = extdata + "map" + wig_file
-    gc_path     = extdata + "gc" + gc_file
+    gc_path     = extdata + "gc" + wig_file
     cen_path    = extdata + cen_file
     normal_path = extdata + normal_file
-    return {"map":map_path, "gc"=gc_path, "cen"=cen_path, "norm"=normal_path}
+    return { "map":map_path, "gc":gc_path, "cen":cen_path, "norm":normal_path }
 
 def get_ichorChrs(chr_path):
-    chr_path = "net-002.chrs"
-    file=open(chr_path, mode='r',newline="\n")
+    print(str(chr_path))
+    file=open(str(chr_path), mode='r',newline="\n")
     chrs = file.read()
     
-    chrs        = re.sub("chr", "", chrs)
-    chr_train   = "c(" + re.sub(",X.*\\n$", "", chrs) + ")"
-    chrs        = "c(" + re.sub(",Y.*\\n$", "", chrs) + ")"
+    chrs        = re.sub("chr", "", chrs.rstrip())
+    chr_train   = "c(" + re.sub(",X.*$", "", chrs) + ")"
+#    chrs        = "c(" + re.sub(",Y.*$", "", chrs) + ")"
+    chrs        = "c(" + re.sub(",X.*$", "", chrs) + ")"
     
     return {"all":chrs, "train":chr_train}
