@@ -40,9 +40,11 @@ rule readcounter:
 
 rule get_RlibPath:
     output:
-        "results/cnv/ichorcna/libpath"
+        "results/ref/libpath"
     conda:
         "../envs/r.yaml"
+    priority:
+        50
     shell:
         "Rscript -e \"cat(.libPaths(), '\n')\" > {output}"
 
@@ -54,8 +56,8 @@ rule ichorcna:
         chrs=rules.get_chromosomes.output,
         ref=config['common']['genome'],
     output:
-        dir="results/cnv/ichorcna/{sample}",
-        file="results/cnv/ichorcna/{sample}/{sample}_tpdf.pdf",
+        dir=directory("results/cnv/ichorcna/{sample}"),
+        file="results/cnv/ichorcna/{sample}/{sample}/{sample}_genomeWide.pdf",
     log:
         "logs/cnv/ichorcna/{sample}.log"
     conda:
@@ -64,10 +66,10 @@ rule ichorcna:
         ploidy=config['params']['ichorcna']['ploidy'],
         normal=config['params']['ichorcna']['normal'],
         maxCN=config['params']['ichorcna']['maxCN'],
-        gc_wig=get_ichorPath(rules.get_RlibPath.output)['gc'],
-        map_wig=get_ichorPath(rules.get_RlibPath.output)['map'],
-        centromere=get_ichorPath(rules.get_RlibPath.output)['cen'],
-        normal_panel=get_ichorPath(rules.get_RlibPath.output)['norm'],
+        gc_wig=lambda w, input: get_ichorPath(input[2])['gc'],
+        map_wig=lambda w, input: get_ichorPath(input[2])['map'],
+        centromere=lambda w, input: get_ichorPath(input[2])['cen'],
+        normal_panel=lambda w, input: get_ichorPath(input[2])['norm'],
         HOMD=config['params']['ichorcna']['include_HOMD'],
         chrs=lambda w, input: get_ichorChrs(input[3].format(sample=w.sample))['all'],
         chr_train=lambda w, input: get_ichorChrs(input[3].format(sample=w.sample))['train'],

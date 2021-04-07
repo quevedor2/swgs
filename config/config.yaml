@@ -45,7 +45,7 @@ params:
   ichorcna:
     ploidy: "c(2,3)"
     normal: "c(0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9)"
-    genome_style: UCSC
+    genome_style: NCBI
     maxCN: 5
     include_HOMD: True
     estimateNormal: True
