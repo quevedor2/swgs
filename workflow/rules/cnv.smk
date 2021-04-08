@@ -57,7 +57,8 @@ rule ichorcna:
         ref=config['common']['genome'],
     output:
         dir=directory("results/cnv/ichorcna/{sample}"),
-        file="results/cnv/ichorcna/{sample}/{sample}/{sample}_genomeWide.pdf",
+        file=report("results/cnv/ichorcna/{sample}/{sample}/{sample}_genomeWide.pdf",
+                     caption="../report/ichor.rst", category="CNV"),
     log:
         "logs/cnv/ichorcna/{sample}.log"
     conda:
@@ -104,6 +105,7 @@ rule ichorcna:
         "--genomeStyle {params.genome_style} "
         "--outDir '{output.dir}' 2> {log}"
 
+# rule relocate_cna_files:
 '''
         "--genomeBuild {params.genome_build} "
         "--NORMWIG {params.normalWig} "
