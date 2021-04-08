@@ -2,7 +2,6 @@
 workflow/.snakemake
 data
 results
-alignment
+report
 logs
-qc
 report.html
