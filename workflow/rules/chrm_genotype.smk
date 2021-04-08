@@ -80,3 +80,66 @@ rule genotype_gvcfs:
         mem_mb=2048
     wrapper:
         "0.73.0/bio/gatk/genotypegvcfs"
+
+rule tabix_vcf:
+    input:
+        vcf="results/sampleid/chrM/{sample}.chrM.vcf"
+    output:
+        gz="results/sampleid/chrM/{sample}.chrM.vcf.gz",
+        tbi="results/sampleid/chrM/{sample}.chrM.vcf.gz.tbi",
+    log:
+        "logs/gatk/genotype_checker/tabix.log",
+    conda:
+        "../envs/tabix.yaml",
+    resources:
+        mem_mb=1024
+    shell:
+        "bgzip {input.vcf} ; "
+        "tabix {output.gz}"
+
+rule chrM_vcf_merge:
+    input:
+        vcfs=expand("results/sampleid/chrM/{sample}.chrM.vcf.gz", sample=samples.index),
+    output:
+        vcf="results/sampleid/chrM/merge.vcf",
+    log:
+        "logs/gatk/genotype_checker/merge.log",
+    conda:
+        "../envs/vcftools.yaml",
+    resources:
+        mem_mb=8192
+    shell:
+        vcf-merge {input.vcfs} > {output.vcf}"
+
+rule genotype_checker:
+    input:
+        vcf="results/sampleid/chrM/merge.vcf",
+        samples=",".join(expand("{sample}", sample=samples.index)),
+    output:
+        tbl=report("results/sampleid/chrM/chrM_sampleid.tsv",
+                    caption="../report/chrMid.rst", category="genotypeID")
+        plot=report("results/sampleid/chrM/chrM_sampleid.pdf",
+                    caption="../report/chrMid.rst", category="genotypeID")
+    log:
+        "logs/gatk/genotype_checker/merge.log",
+    conda:
+        "../envs/r.yaml",
+    resources:
+        mem_mb=8192
+    shell:
+        "Rscript workflow/scripts/genotypeChecker.R "
+        "{input.vcf} "
+        "'{input.samples}' "
+        "{output.tbl} "
+        "{output.plot} "
+
+rule relocate_chrm_files:
+    input:
+        tbl="results/sampleid/chrM/chrM_sampleid.tsv",
+        plot="results/sampleid/chrM/chrM_sampleid.pdf",
+    output:
+        tbl="results/tables/genotypeID/chrM_sampleid.tsv",
+        plot="results/plots/genotypeID/chrM_sampleid.pdf",
+    shell:
+        "cp {input.plot} {output.plot}; "
+        "cp {input.tbl} {output.tbl}; "
