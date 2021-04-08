@@ -17,10 +17,8 @@ rule all:
       "results/plots/cnv/net-001a_genomeWide.pdf",
       "results/plots/cnv/net-001b_genomeWide.pdf",
       "results/plots/cnv/net-002_genomeWide.pdf",
-      "results/sampleid/chrM/net-037.chrM.vcf",
-      "results/sampleid/chrM/net-001a.chrM.vcf",
-      "results/sampleid/chrM/net-001b.chrM.vcf",
-      "results/sampleid/chrM/net-002.chrM.vcf",
+      "results/tables/genotypeID/chrM_sampleid.tsv",
+      "results/plots/genotypeID/chrM_sampleid.pdf",
       #rules.indelrealigner.output
 #    input: all_input
         # The first rule should define the default target files

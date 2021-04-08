@@ -30,8 +30,6 @@ genotype <- function(b) {
 ### Read the Sample genotype table and assign columns###
 Mega_VCF = read.csv(in_vcf, sep = "\t", comment.char = "#")
 
-rownames(Mega_VCF) = paste0(Mega_VCF$CHROM,":", Mega_VCF$POS,
-                            Mega_VCF$REF, ">", Mega_VCF$ALT)
 sample_sub = Mega_VCF[,10:ncol(Mega_VCF)]
 colnames(sample_sub) <- strsplit(sample_ids, ",")[[1]]
 
@@ -54,6 +52,7 @@ mat <- apply(sample_count.data, 2, function(i){
   })
 })
 colnames(mat) <- rownames(mat) <- strsplit(sample_ids, ",")[[1]]
+
 
 write.table(round(mat,3), file = out_table,
             row.names = TRUE, col.names = NA , sep = "\t")

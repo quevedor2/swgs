@@ -88,9 +88,9 @@ rule tabix_vcf:
         gz="results/sampleid/chrM/{sample}.chrM.vcf.gz",
         tbi="results/sampleid/chrM/{sample}.chrM.vcf.gz.tbi",
     log:
-        "logs/gatk/genotype_checker/tabix.log",
+        "logs/gatk/genotype_checker/tabix_{sample}.log",
     conda:
-        "../envs/tabix.yaml",
+        "../envs/vcftools.yaml",
     resources:
         mem_mb=1024
     shell:
@@ -109,19 +109,20 @@ rule chrM_vcf_merge:
     resources:
         mem_mb=8192
     shell:
-        vcf-merge {input.vcfs} > {output.vcf}"
+        "vcf-merge {input.vcfs} > {output.vcf}"
 
 rule genotype_checker:
     input:
         vcf="results/sampleid/chrM/merge.vcf",
-        samples=",".join(expand("{sample}", sample=samples.index)),
     output:
         tbl=report("results/sampleid/chrM/chrM_sampleid.tsv",
-                    caption="../report/chrMid.rst", category="genotypeID")
+                    caption="../report/chrMid.rst", category="genotypeID"),
         plot=report("results/sampleid/chrM/chrM_sampleid.pdf",
-                    caption="../report/chrMid.rst", category="genotypeID")
+                    caption="../report/chrMid.rst", category="genotypeID"),
     log:
         "logs/gatk/genotype_checker/merge.log",
+    params:
+        samples=",".join(expand("{sample}", sample=samples.index)),
     conda:
         "../envs/r.yaml",
     resources:
@@ -129,7 +130,7 @@ rule genotype_checker:
     shell:
         "Rscript workflow/scripts/genotypeChecker.R "
         "{input.vcf} "
-        "'{input.samples}' "
+        "'{params.samples}' "
         "{output.tbl} "
         "{output.plot} "
 
