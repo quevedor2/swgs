@@ -2,6 +2,5 @@
 workflow/.snakemake
 data
 results
-report
 logs
 report.html
