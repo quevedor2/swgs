@@ -105,7 +105,19 @@ rule ichorcna:
         "--genomeStyle {params.genome_style} "
         "--outDir '{output.dir}' 2> {log}"
 
-# rule relocate_cna_files:
+rule relocate_cna_files:
+    input:
+        plot="results/cnv/ichorcna/{sample}/{sample}/{sample}_genomeWide.pdf",
+        seg="results/cnv/ichorcna/{sample}/{sample}.seg.txt",
+    output:
+        plot="results/plots/cnv/{sample}_genomeWide.pdf",
+        seg="results/tables/cnv/{sample}.seg.txt",
+    shell:
+        "cp {input.plot} {output.plot}; "
+        "cp {input.seg} {output.seg}; "
+
+
+
 '''
         "--genomeBuild {params.genome_build} "
         "--NORMWIG {params.normalWig} "
