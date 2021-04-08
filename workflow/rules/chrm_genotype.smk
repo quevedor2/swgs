@@ -2,44 +2,38 @@ rule chrM_fa:
     input:
         fa=config['common']['genome'],
     output:
-        "resources/chrM.fa",
+        fa="resources/chrM.fa",
+        idx="resources/chrM.fa.fai",
     conda:
         "../envs/samtools.yaml",
     shell:
-        "samtools faidx {input.fa} chrM > {output}"
-
-rule chrM_faidx:
-    input:
-        "resources/chrM.fa",
-    output:
-        "resources/chrM.fa.fai",
-    conda:
-        "../envs/samtools.yaml",
-    shell:
-        "samtools faidx {input}"
+        "samtools faidx {input.fa} chrM > {output.fa}; "
+        "samtools faidx {output.fa}; "
 
 rule chrM_dict:
     input:
         "resources/chrM.fa",
     output:
-        "resources/chrM.dict",
+        dict="resources/chrM.dict",
+        bed="resources/chrM.bed",
     conda:
         "../envs/gatk.yaml",
     shell:
-        "gatk CreateSequenceDictionary -R {input}"
+        "gatk CreateSequenceDictionary -R {input} ; "
+        "echo -e 'chrM\t1\t'$(grep 'chrM' resources/chrM.dict  | cut -f3 | sed 's/LN://') > {output.bed}"
 
 rule subset_chrM:
     input:
         "results/alignment/recal/{sample}.bqsr.bam",
     output:
-        "results/sampleid/chrM/{sample}.chrM.bam",
+        bam="results/sampleid/chrM/{sample}.chrM.bam",
     conda:
         "../envs/samtools.yaml",
     params:
         param='-bsh',
         chr='chrM',
     shell:
-        "samtools view {params.param} {input} {params.chr} > {output}"
+        "samtools view {params.param} {input} {params.chr} > {output.bam} ; "
 
 rule chrM_index:
     input:
@@ -55,15 +49,16 @@ rule chrM_haplotype_caller:
     input:
         bam="results/sampleid/chrM/{sample}.chrM.bam",
         bai="results/sampleid/chrM/{sample}.chrM.bam.bai",
-        ref="resources/chrM.fa",
-        refidx="resources/chrM.fa.fai",
-        refdict="resources/chrM.dict",
+        ref=rules.chrM_fa.output.fa,
+        refidx=rules.chrM_fa.output.fa,
+        refdict=rules.chrM_dict.output.dict,
+        bed=rules.chrM_dict.output.bed,
     output:
         gvcf="results/sampleid/chrM/{sample}.chrM.gvcf",
     log:
         "logs/gatk/haplotypecaller/{sample}.gvcf.chrM.log"
     params:
-        extra="",  # optional
+        extra="-L resources/chrM.bed",  # optional
         java_opts="", # optional
     resources:
         mem_mb=2048
