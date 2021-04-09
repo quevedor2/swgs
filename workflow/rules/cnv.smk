@@ -21,7 +21,7 @@ rule readcounter:
         bai="results/alignment/recal/{sample}.bqsr.bam.bai",
         chrs="results/cnv/ichorcna/{sample}.chrs",
     output:
-        "results/cnv/ichorcna/{sample}.wig",
+        temp("results/cnv/ichorcna/{sample}.wig"),
     params:
         window=config['params']['readcounter']['window'],
         quality=config['params']['readcounter']['quality'],
@@ -40,13 +40,11 @@ rule readcounter:
 
 rule get_RlibPath:
     output:
-        "results/ref/libpath"
+        temp("results/ref/{sample}.libpath"),
     conda:
-        "../envs/r.yaml"
-    priority:
-        50
+        "../envs/r.yaml",
     shell:
-        "Rscript -e \"cat(.libPaths(), '\n')\" > {output}"
+        "Rscript -e 'cat(.libPaths(), \"\n\")' > {output} "
 
 rule ichorcna:
     input:
@@ -59,6 +57,7 @@ rule ichorcna:
         dir=directory("results/cnv/ichorcna/{sample}"),
         file=report("results/cnv/ichorcna/{sample}/{sample}/{sample}_genomeWide.pdf",
                      caption="../report/ichor.rst", category="CNV"),
+        seg="results/cnv/ichorcna/{sample}/{sample}.seg.txt",
     log:
         "logs/cnv/ichorcna/{sample}.log"
     conda:
