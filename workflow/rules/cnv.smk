@@ -66,13 +66,13 @@ rule ichorcna:
         ploidy=config['params']['ichorcna']['ploidy'],
         normal=config['params']['ichorcna']['normal'],
         maxCN=config['params']['ichorcna']['maxCN'],
-        gc_wig=lambda w, input: get_ichorPath(input[2])['gc'],
-        map_wig=lambda w, input: get_ichorPath(input[2])['map'],
-        centromere=lambda w, input: get_ichorPath(input[2])['cen'],
-        normal_panel=lambda w, input: get_ichorPath(input[2])['norm'],
+#        gc_wig=lambda w, input: get_ichorPath(input[2])['gc'],
+#        map_wig=lambda w, input: get_ichorPath(input[2])['map'],
+#        centromere=lambda w, input: get_ichorPath(input[2])['cen'],
+#        normal_panel=lambda w, input: get_ichorPath(input[2])['norm'],
         HOMD=config['params']['ichorcna']['include_HOMD'],
-        chrs=lambda w, input: get_ichorChrs(input[3].format(sample=w.sample))['all'],
-        chr_train=lambda w, input: get_ichorChrs(input[3].format(sample=w.sample))['train'],
+#        chrs=lambda w, input: get_ichorChrs(input[3].format(sample=w.sample))['all'],
+#        chr_train=lambda w, input: get_ichorChrs(input[3].format(sample=w.sample))['train'],
         estimateNormal=config['params']['ichorcna']['estimateNormal'],
         estimatePloidy=config['params']['ichorcna']['estimatePloidy'],
         estimateScPrevalence=config['params']['ichorcna']['estimateScPrevalence'],
@@ -88,13 +88,13 @@ rule ichorcna:
         "--ploidy '{params.ploidy}' "
         "--normal '{params.normal}' "
         "--maxCN {params.maxCN} "
-        "--gcWig '{params.gc_wig}' "
-        "--mapWig '{params.map_wig}' "
-        "--centromere '{params.centromere}' "
-        "--normalPanel '{params.normal_panel}' "
+        "--gcWig '$(python workflow/scripts/parse_paths.py -i {input.rlib} -r 'wig')' "
+        "--mapWig '$(python workflow/scripts/parse_paths.py -i {input.rlib} -r 'map')' "
+        "--centromere '$(python workflow/scripts/parse_paths.py -i {input.rlib} -r 'cen')' "
+        "--normalPanel '$(python workflow/scripts/parse_paths.py -i {input.rlib} -r 'norm')' "
         "--includeHOMD {params.HOMD} "
-        "--chrs '{params.chrs}' "
-        "--chrTrain '{params.chr_train}' "
+        "--chrs '$(python workflow/scripts/parse_paths.py -i {input.rlib} -r 'all')' "
+        "--chrTrain '$(python workflow/scripts/parse_paths.py -i {input.rlib} -r 'train')' "
         "--estimateNormal {params.estimateNormal} "
         "--estimatePloidy {params.estimatePloidy} "
         "--estimateScPrevalence {params.estimateScPrevalence} "
@@ -115,7 +115,15 @@ rule relocate_cna_files:
         "cp {input.plot} {output.plot}; "
         "cp {input.seg} {output.seg}; "
 
-
+'''
+        "--gcWig '{params.gc_wig}' "
+        "--mapWig '{params.map_wig}' "
+        "--centromere '{params.centromere}' "
+        "--normalPanel '{params.normal_panel}' "
+        "--includeHOMD {params.HOMD} "
+        "--chrs '{params.chrs}' "
+        "--chrTrain '{params.chr_train}' "
+'''
 
 '''
         "--genomeBuild {params.genome_build} "
