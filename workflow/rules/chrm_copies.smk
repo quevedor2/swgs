@@ -10,9 +10,9 @@ rule chrM_make_interval:
         "picard BedToIntervalList "
         "I={input.bed} "
         "O={output.bed} "
-        "SD={output.dict} "
+        "SD={input.dict} "
 
-rule collect_wgs_metrics:
+rule collect_chr_metrics:
     input:
         bam=rules.subset_chrM.output.bam,
         ref=rules.chrM_fa.output.fa,

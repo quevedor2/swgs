@@ -8,6 +8,7 @@ include: "rules/gatk.smk"
 include: "rules/qc.smk"
 include: "rules/cnv.smk"
 include: "rules/chrm_genotype.smk"
+include: "rules/chrm_copies.smk"
 include: "rules/other.smk"
 
 rule all:
