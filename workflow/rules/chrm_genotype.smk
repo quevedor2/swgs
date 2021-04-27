@@ -30,7 +30,7 @@ rule subset_chrM:
     conda:
         "../envs/samtools.yaml",
     params:
-        param='-bsh',
+        param='-bh',
         chr='chrM',
     shell:
         "samtools view {params.param} {input} {params.chr} > {output.bam} ; "

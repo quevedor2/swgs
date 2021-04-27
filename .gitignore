@@ -5,3 +5,5 @@ results
 logs
 report.html
 resources/chrM*
+.conda/
+slurm*.out

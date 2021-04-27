@@ -40,7 +40,7 @@ rule readcounter:
 
 rule get_RlibPath:
     output:
-        temp("results/ref/{sample}.libpath"),
+        temp("results/ref/libpath"),
     conda:
         "../envs/r.yaml",
     shell:
@@ -88,13 +88,13 @@ rule ichorcna:
         "--ploidy '{params.ploidy}' "
         "--normal '{params.normal}' "
         "--maxCN {params.maxCN} "
-        "--gcWig '$(python workflow/scripts/parse_paths.py -i {input.rlib} -r 'wig')' "
-        "--mapWig '$(python workflow/scripts/parse_paths.py -i {input.rlib} -r 'map')' "
-        "--centromere '$(python workflow/scripts/parse_paths.py -i {input.rlib} -r 'cen')' "
-        "--normalPanel '$(python workflow/scripts/parse_paths.py -i {input.rlib} -r 'norm')' "
+        "--gcWig \"$(python workflow/scripts/parse_paths.py -i {input.rlib} -r 'gc')\" "
+        "--mapWig \"$(python workflow/scripts/parse_paths.py -i {input.rlib} -r 'map')\" "
+        "--centromere \"$(python workflow/scripts/parse_paths.py -i {input.rlib} -r 'cen')\" "
+        "--normalPanel \"$(python workflow/scripts/parse_paths.py -i {input.rlib} -r 'norm')\" "
         "--includeHOMD {params.HOMD} "
-        "--chrs '$(python workflow/scripts/parse_paths.py -i {input.rlib} -r 'all')' "
-        "--chrTrain '$(python workflow/scripts/parse_paths.py -i {input.rlib} -r 'train')' "
+        "--chrs \"$(python workflow/scripts/parse_paths.py -i {input.chrs} -r 'all')\" "
+        "--chrTrain \"$(python workflow/scripts/parse_paths.py -i {input.chrs} -r 'train')\" "
         "--estimateNormal {params.estimateNormal} "
         "--estimatePloidy {params.estimatePloidy} "
         "--estimateScPrevalence {params.estimateScPrevalence} "

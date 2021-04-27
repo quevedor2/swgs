@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-import pandas as pd
-from snakemake.utils import validate
-import sys, getopt, re
+#import pandas as pd
+import sys, getopt, re, yaml
 
-def get_ichorPath(rlib_path):
+def get_ichorPath(rlib_path, config):
     #print(str(rlib_path))
     file=open(str(rlib_path), mode='r',newline="\n")
     rlib_path = file.read()
@@ -35,7 +34,7 @@ def get_ichorPath(rlib_path):
     normal_path = extdata + normal_file
     return { "map":map_path, "gc":gc_path, "cen":cen_path, "norm":normal_path }
 
-def get_ichorChrs(chr_path):
+def get_ichorChrs(chr_path, config):
     #print(str(chr_path))
     file=open(str(chr_path), mode='r',newline="\n")
     chrs = file.read()
@@ -49,8 +48,9 @@ def get_ichorChrs(chr_path):
 
 def main(argv):
     # Config file
-    configfile: "config/config.yaml"
-    validate(config, schema="../schemas/config.schema.yaml")
+    configfile= "config/config.yaml"
+    file=open(configfile)
+    config=yaml.load(file, Loader=yaml.FullLoader)
     
     inputfile = ''
     returnarg = ''
@@ -71,9 +71,9 @@ def main(argv):
             returnarg = arg
     
     if returnarg in ['map', 'gc', 'cen', 'norm']:
-        returnval = get_ichorPath(inputfile)[returnarg]
+        returnval = get_ichorPath(inputfile, config)[returnarg]
     elif returnarg in ['all', 'train']:
-        returnval = get_ichorChrs(inputfile)[returnarg]
+        returnval = get_ichorChrs(inputfile, config)[returnarg]
     print(returnval)
 
 if __name__ == "__main__":
