@@ -99,8 +99,10 @@ rule printreads:
 
 rule symlink_bai:
     input:
+        "results/alignment/recal/{sample}.bqsr.bam",
+    params:
         "results/alignment/recal/{sample}.bqsr.bai",
     output:
         "results/alignment/recal/{sample}.bqsr.bam.bai",
     shell:
-        "ln -s $(readlink -f {input}) {output}"
+        "ln -s $(readlink -f {params}) {output}"
