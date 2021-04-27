@@ -139,11 +139,14 @@ rule genotype_checker:
 
 rule relocate_chrm_files:
     input:
-        tbl="results/sampleid/chrM/chrM_sampleid.tsv",
+        ntbl="results/sampleid/chrM/chrM_sampleid_n.tsv",
+        jacctbl="results/sampleid/chrM/chrM_sampleid_jacc.tsv",
         plot="results/sampleid/chrM/chrM_sampleid.pdf",
     output:
-        tbl="results/tables/genotypeID/chrM_sampleid.tsv",
+        ntbl="results/tables/genotypeID/chrM_sampleid_n.tsv",
+        jacctbl="results/tables/genotypeID/chrM_sampleid_jacc.tsv",
         plot="results/plots/genotypeID/chrM_sampleid.pdf",
     shell:
         "cp {input.plot} {output.plot}; "
-        "cp {input.tbl} {output.tbl}; "
+        "cp {input.ntbl} {output.ntbl}; "
+        "cp {input.jacctbl} {output.jacctbl}; "
