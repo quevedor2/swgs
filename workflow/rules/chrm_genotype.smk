@@ -115,7 +115,9 @@ rule genotype_checker:
     input:
         vcf="results/sampleid/chrM/merge.vcf",
     output:
-        tbl=report("results/sampleid/chrM/chrM_sampleid.tsv",
+        ntbl=report("results/sampleid/chrM/chrM_sampleid_n.tsv",
+                    caption="../report/chrMid.rst", category="genotypeID"),
+        jacctbl=report("results/sampleid/chrM/chrM_sampleid_jacc.tsv",
                     caption="../report/chrMid.rst", category="genotypeID"),
         plot=report("results/sampleid/chrM/chrM_sampleid.pdf",
                     caption="../report/chrMid.rst", category="genotypeID"),
@@ -131,7 +133,8 @@ rule genotype_checker:
         "Rscript workflow/scripts/genotypeChecker.R "
         "{input.vcf} "
         "'{params.samples}' "
-        "{output.tbl} "
+        "{output.jacctbl} "
+        "{output.ntbl} "
         "{output.plot} "
 
 rule relocate_chrm_files:
