@@ -1,6 +1,5 @@
 #### Author : A. Danesh
 #### First created : Feb 2014
-#### Last update : April 2017 (Rene: Sped up the code and removed fluff)
 ##### This code find the jaccard indices between samples from a vcf input file. It is made for Sample check #####
 ### The vcf file : The vcf file is created by merging all samples' vcfs from unifiedgenotyper using vcftools## the merged vcf has all the genotype data after the 10th column###
 ###########
@@ -34,7 +33,7 @@ cleanGenotype <- function(b) {
   # information; if a call cannot be made for a sample at a given locus, ”.”
   # must be specified for each missing allele in the GT field (for example
   # ./. for a diploid). The meanings of the separators are:
-  stopifnot(class(b)=='matrix')
+  stopifnot(any(class(b)=='matrix'))
   
   b <- gsub("\\|", "/", b)                 # convert phased to unphased
   b[b == '.'] <- "0/0"                     # convert No-call to HOMREF
