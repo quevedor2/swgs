@@ -1,9 +1,3 @@
-"Rscript workflow/scripts/genotypeChecker.R "
-in_vcf <- "results/sampleid/chrM/merge.vcf"
-"'{params.samples}' "
-"{output.tbl} "
-"{output.plot} "
-
 #### Author : A. Danesh
 #### First created : Feb 2014
 #### Last update : April 2017 (Rene: Sped up the code and removed fluff)
@@ -79,7 +73,7 @@ colnames(sample_sub) <- strsplit(sample_ids, ",")[[1]]
 
 # Parse haplotype caller into the first column (i.e. 0/0, or 1/1, or 0/1).
 sample_geno <- apply(sample_sub, 2, getGT)
-sample_count <- cleanGenotype(sample_geno)
+sample_count <- cleanGenotype(as.matrix(sample_geno))
 
 ## Read all the samples and count the genotypes####
 jacc_n <- apply(sample_count, 2, function(i){
