@@ -8,6 +8,8 @@ channels:
 dependencies:
  - r-base ==4.0.3
  - r-optparse
+ - r-ggplot2 ==3.3.0
+ - r-reshape2 ==1.4.4
  - r-ichorcna ==0.2.1
  - hmmcopy ==0.1.1
  - samtools ==1.12

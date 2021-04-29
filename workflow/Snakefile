@@ -14,7 +14,7 @@ include: "rules/other.smk"
 rule all:
     input:
       "results/plots/qc/wgs_insert_metrics.pdf",
-      expand("results/plots/cnv/{sample}_genomeWide.pdf", sample=samples.idx),
+      expand("results/plots/cnv/{sample}_genomeWide.pdf", sample=samples.index),
       "results/tables/genotypeID/chrM_sampleid_n.tsv",
       "results/tables/genotypeID/chrM_sampleid_jacc.tsv",
       "results/plots/genotypeID/chrM_sampleid.pdf",
