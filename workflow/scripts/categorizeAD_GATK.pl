@@ -1,4 +1,4 @@
-!/usr/bin/perl
+#!/usr/bin/perl
 use List::Util qw/sum/;
 
 my ($filename, $ref_col, $alt_col) = @ARGV;
