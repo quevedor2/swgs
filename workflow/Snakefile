@@ -16,7 +16,9 @@ rule all:
     input:
       "results/plots/qc/wgs_insert_metrics.pdf",
       expand("results/plots/cnv/{sample}_genomeWide.pdf", sample=samples.index),
-      expand("results/sampleid/autosome/simple/{sample}_out.tsv", sample=samples.index),
+      "results/zygosity/AD/aggregate_filt.tsv",
+      "results/zygosity/AD/aggregate_pos.txt",
+      "results/zygosity/AD/aggregate_lines.txt",
       "results/tables/genotypeID/chrM_sampleid_n.tsv",
       "results/tables/genotypeID/chrM_sampleid_jacc.tsv",
       "results/plots/genotypeID/chrM_sampleid.pdf",
