@@ -35,20 +35,21 @@ rule categorizeAD_GATK:
 
 rule aggregateAD:
   input:
-    expand("results/zygosity/counts/{sample}_out.tsv", sample=samples.index)
+    expand("results/zygosity/counts/{sample}_out.tsv", sample=samples.index),
   output:
-    aggregate_raw="results/zygosity/AD/aggregate.tsv",
-    aggregate_filt="results/zygosity/AD/aggregate_filt.tsv",
+    aggregate_raw="results/zygosity/AD/aggregate.csv",
+    aggregate_filt="results/zygosity/AD/aggregate_filt.csv",
     filt_lines="results/zygosity/AD/aggregate_lines.txt",
     filt_pos="results/zygosity/AD/aggregate_pos.txt",
   params:
     target=config['params']['gatk']['collectalleliccounts']['target'],
+    min_n=2,
   conda:
     "../envs/perl.yaml",
   shell:
     "paste -d',' {input} > {output.aggregate_raw}; "
-    "awk -F\',\' \'{ for(i=1; i<=NF;i++) if ($i!=0) j++; if (j >= {params.n}) print NR; j=0 }\' {output.aggregate_raw} > {output.filt_lines}; "
+    "awk -F',' '\{ for(i=1; i<=NF;i++) if ($i!=0) j++; if (j >= {params.min_n}) print NR; j=0 \}' {output.aggregate_raw} > {output.filt_lines}; "
     "perl workflow/scripts/getLinesFromFile.py "
     "{output.filt_lines} {output.aggregate_raw} > {output.aggregate_filt}; "
     "perl workflow/scripts/getLinesFromFile.py "
-    "{output.filt_lines} {params.target} > {output.filt_pos}; "
+    "{output.filt_lines} {params.target} > {output.filt_pos} "

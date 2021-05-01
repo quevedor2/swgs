@@ -16,7 +16,7 @@ rule all:
     input:
       "results/plots/qc/wgs_insert_metrics.pdf",
       expand("results/plots/cnv/{sample}_genomeWide.pdf", sample=samples.index),
-      "results/zygosity/AD/aggregate_filt.tsv",
+      "results/zygosity/AD/aggregate_filt.csv",
       "results/zygosity/AD/aggregate_pos.txt",
       "results/zygosity/AD/aggregate_lines.txt",
       "results/tables/genotypeID/chrM_sampleid_n.tsv",
@@ -24,8 +24,3 @@ rule all:
       "results/plots/genotypeID/chrM_sampleid.pdf",
       "results/tables/chrM/chrM_copies.tsv",
       "results/plots/chrM/chrM_copies.pdf",
-
-      #rules.indelrealigner.output
-#    input: all_input
-        # The first rule should define the default target files
-        # Subsequent target rules can be specified below. They should start with all_*.
