@@ -56,7 +56,6 @@ sub CategorizeAD {
 
 #### main ####
 my ($analysis, $filename, $wild, $alt_col) = @ARGV;
-print("Filename: ", $filename, "\n");
 open(FH, "<", $filename) or die $!;
 
 if($analysis eq 'getlines'){
