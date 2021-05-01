@@ -30,27 +30,57 @@ rule categorizeAD_GATK:
     "../envs/perl.yaml",
   shell:
     "grep -v '^@' {input} | tail -n +2 > {output.intermediate}; "
-    "perl workflow/scripts/allelic_count_helper.py categorize "
+    "perl workflow/scripts/allelic_count_helper.pl categorize "
     "{output.intermediate} {params.ref} {params.alt} > {output.simple}"
 
 rule aggregateAD:
   input:
     expand("results/zygosity/counts/{sample}_out.tsv", sample=samples.index),
   output:
-    aggregate_raw="results/zygosity/AD/aggregate.csv",
-    aggregate_filt="results/zygosity/AD/aggregate_filt.csv",
-    filt_lines="results/zygosity/AD/aggregate_lines.txt",
-    filt_pos="results/zygosity/AD/aggregate_pos.txt",
+    "results/zygosity/AD/aggregate.csv",
   params:
-    target=config['params']['gatk']['collectalleliccounts']['target'],
+    ""
+  conda:
+    "../envs/perl.yaml",
+  shell:
+    "paste -d',' {input} > {output}; "
+
+rule getADlines:
+  input:
+    "results/zygosity/AD/aggregate.csv",
+  output:
+    "results/zygosity/AD/aggregate_lines.txt",
+  params:
     min_n=2,
   conda:
     "../envs/perl.yaml",
   shell:
-    "paste -d',' {input} > {output.aggregate_raw}; "
-    "perl workflow/scripts/allelic_count_helper.py getlines "
-    "{output.aggregate_raw} {params.min_n} > {output.filt_lines}; "
-    "perl workflow/scripts/allelic_count_helper.py getlines "
-    "{output.filt_lines} {output.aggregate_raw} > {output.aggregate_filt}; "
-    "perl workflow/scripts/allelic_count_helper.py getlines "
-    "{output.filt_lines} {params.target} > {output.filt_pos}; "
+    "perl workflow/scripts/allelic_count_helper.pl setlines "
+    "{input} {params.min_n} > {output}; "
+
+rule filtADraw:
+  input:
+    filt_lines="results/zygosity/AD/aggregate_lines.txt",
+    aggregate_raw="results/zygosity/AD/aggregate.csv",
+  output:
+    "results/zygosity/AD/aggregate_filt.csv",
+  params:
+    "",
+  conda:
+    "../envs/perl.yaml",
+  shell:
+    "perl workflow/scripts/allelic_count_helper.pl getlines "
+    "{input.filt_lines} {input.aggregate_raw} > {output}; "
+
+rule filtADdbsnp:
+  input:
+    filt_lines="results/zygosity/AD/aggregate_lines.txt",
+  output:
+    "results/zygosity/AD/aggregate_pos.txt",
+  params:
+    target=config['params']['gatk']['collectalleliccounts']['target'],
+  conda:
+    "../envs/perl.yaml",
+  shell:
+    "perl workflow/scripts/allelic_count_helper.pl getlines "
+    "{input.filt_lines} {params.target} > {output}; "

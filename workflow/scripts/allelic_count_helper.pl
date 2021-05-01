@@ -56,9 +56,10 @@ sub CategorizeAD {
 
 #### main ####
 my ($analysis, $filename, $wild, $alt_col) = @ARGV;
+print("Filename: ", $filename, "\n");
 open(FH, "<", $filename) or die $!;
 
-if($analysis == 'getlines'){
+if($analysis eq 'getlines'){
   my %linenumbers = ();
   while (<FH>) {
     chomp;
@@ -72,9 +73,9 @@ if($analysis == 'getlines'){
 } else {
   my $line=1;
   while(<FH>){
-    if($analysis == 'setlines'){
+    if($analysis eq 'setlines'){
       my $x = GetCovLines($_, $line, $wild);
-    } elsif($analysis == 'categorize'){
+    } elsif($analysis eq 'categorize'){
       my $x = CategorizeAD($_, $line, $wild);
     }
     $line++;
