@@ -30,7 +30,7 @@ rule categorizeAD_GATK:
     "../envs/perl.yaml",
   shell:
     "grep -v '^@' {input} | tail -n +2 > {output.intermediate}; "
-    "perl workflow/scripts/categorizeAD_GATK.pl "
+    "perl workflow/scripts/allelic_count_helper.py categorize "
     "{output.intermediate} {params.ref} {params.alt} > {output.simple}"
 
 rule aggregateAD:
@@ -48,8 +48,9 @@ rule aggregateAD:
     "../envs/perl.yaml",
   shell:
     "paste -d',' {input} > {output.aggregate_raw}; "
-    "awk -F',' '\{ for(i=1; i<=NF;i++) if ($i!=0) j++; if (j >= {params.min_n}) print NR; j=0 \}' {output.aggregate_raw} > {output.filt_lines}; "
-    "perl workflow/scripts/getLinesFromFile.py "
+    "perl workflow/scripts/allelic_count_helper.py getlines "
+    "{output.aggregate_raw} {params.min_n} > {output.filt_lines}; "
+    "perl workflow/scripts/allelic_count_helper.py getlines "
     "{output.filt_lines} {output.aggregate_raw} > {output.aggregate_filt}; "
-    "perl workflow/scripts/getLinesFromFile.py "
-    "{output.filt_lines} {params.target} > {output.filt_pos} "
+    "perl workflow/scripts/allelic_count_helper.py getlines "
+    "{output.filt_lines} {params.target} > {output.filt_pos}; "
