@@ -27,7 +27,7 @@ sub GetCovLines {
   foreach(@spl){
     push(@nocov, $_ != 0);
   }
-  print($line, "\n") if(sum(@nocov) >= 2);
+  print($line, "\n") if(sum(@nocov) >= $min_n);
 }
 
 sub CategorizeAD {

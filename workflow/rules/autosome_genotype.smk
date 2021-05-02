@@ -2,7 +2,7 @@ rule collectAllelicCounts:
   input:
     "results/alignment/recal/{sample}.bqsr.bam",
   output:
-    temp("results/zygosity/counts/{sample}.allelicCounts.tsv"),
+    "results/zygosity/counts/{sample}.allelicCounts.tsv",
   conda:
     "../envs/gatk.yaml",
   log:
@@ -11,7 +11,7 @@ rule collectAllelicCounts:
     ref=config['common']['genome'],
     target=config['params']['gatk']['collectalleliccounts']['target'],
   shell:
-    "gatk CollectAllelicCounts "
+    "gatk --java-options '-Xmx8G -XX:ParallelGCThreads=10' CollectAllelicCounts "
     "-I {input} "
     "-R {params.ref} "
     "-L {params.target} "
