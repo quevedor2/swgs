@@ -39,5 +39,6 @@ ichorcna:
   mem : 8192
   cpus-per-task : 8
 
-
-
+collect_allelic_counts:
+  mem : 20G
+  cpus-per-task : 8  

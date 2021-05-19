@@ -1,4 +1,4 @@
-rule collectAllelicCounts:
+rule collect_allelic_counts:
   input:
     "results/alignment/recal/{sample}.bqsr.bam",
   output:
@@ -17,7 +17,7 @@ rule collectAllelicCounts:
     "-L {params.target} "
     "-O {output} > {log} 2>&1"
 
-rule categorizeAD_GATK:
+rule categorizeAD_gatk:
   input:
     "results/zygosity/counts/{sample}.allelicCounts.tsv",
   output:
@@ -33,19 +33,8 @@ rule categorizeAD_GATK:
     "perl workflow/scripts/allelic_count_helper.pl categorize "
     "{output.intermediate} {params.ref} {params.alt} > {output.simple}"
 
-rule getHetSNPs:
-  input:
-    "results/zygosity/counts/{sample}_out.tsv"
-  output:
-    ""
-  conda:
-    ""
-  params:
-    ""
-  shell:
-    
 
-rule aggregateAD:
+rule aggregate_AD:
   input:
     expand("results/zygosity/counts/{sample}_out.tsv", sample=samples.index),
   output:
@@ -57,7 +46,7 @@ rule aggregateAD:
   shell:
     "paste -d',' {input} > {output}; "
 
-rule getADlines:
+rule get_AD_lines:
   input:
     "results/zygosity/AD/aggregate.csv",
   output:
@@ -70,7 +59,7 @@ rule getADlines:
     "perl workflow/scripts/allelic_count_helper.pl setlines "
     "{input} {params.min_n} > {output}; "
 
-rule filtADraw:
+rule filt_AD_raw:
   input:
     filt_lines="results/zygosity/AD/aggregate_lines.txt",
     aggregate_raw="results/zygosity/AD/aggregate.csv",
@@ -85,7 +74,7 @@ rule filtADraw:
     "perl workflow/scripts/allelic_count_helper.pl getlines "
     "{input.filt_lines} {input.aggregate_raw} >> {output}; "
 
-rule filtADdbsnp:
+rule filt_AD_dbsnp:
   input:
     filt_lines="results/zygosity/AD/aggregate_lines.txt",
   output:
