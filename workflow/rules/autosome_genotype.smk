@@ -2,7 +2,7 @@ rule collectAllelicCounts:
   input:
     "results/alignment/recal/{sample}.bqsr.bam",
   output:
-    "results/zygosity/counts/{sample}.allelicCounts.tsv",
+    temp("results/zygosity/counts/{sample}.allelicCounts.tsv"),
   conda:
     "../envs/gatk.yaml",
   log:
@@ -32,6 +32,18 @@ rule categorizeAD_GATK:
     "grep -v '^@' {input} | tail -n +2 > {output.intermediate}; "
     "perl workflow/scripts/allelic_count_helper.pl categorize "
     "{output.intermediate} {params.ref} {params.alt} > {output.simple}"
+
+rule getHetSNPs:
+  input:
+    "results/zygosity/counts/{sample}_out.tsv"
+  output:
+    ""
+  conda:
+    ""
+  params:
+    ""
+  shell:
+    
 
 rule aggregateAD:
   input:
