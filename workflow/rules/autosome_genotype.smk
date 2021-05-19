@@ -11,7 +11,7 @@ rule collect_allelic_counts:
     ref=config['common']['genome'],
     target=config['params']['gatk']['collectalleliccounts']['target'],
   shell:
-    "gatk --java-options '-Xmx8G -XX:ParallelGCThreads=10' CollectAllelicCounts "
+    "gatk --java-options '-Xmx5G -XX:ParallelGCThreads=4' CollectAllelicCounts "
     "-I {input} "
     "-R {params.ref} "
     "-L {params.target} "
@@ -86,3 +86,28 @@ rule filt_AD_dbsnp:
   shell:
     "perl workflow/scripts/allelic_count_helper.pl getlines "
     "{input.filt_lines} {params.target} > {output}; "
+
+rule run_wadingpool:
+  input:
+    het_pos='results/zygosity/AD/aggregate_pos.txt',
+    het_cnt='results/zygosity/AD/aggregate_filt.csv',
+  output:
+    pdfs=expand("results/zygosity/wadingpool/hmmfit_{sample}.pdf", sample=samples.index),
+    tbls=expand("results/zygosity/wadingpool/hmmfit_{sample}.tsv", sample=samples.index),
+    rdas=expand("results/zygosity/wadingpool/hmmfit_{sample}.rda", sample=samples.index),
+  params:
+    outdir='results/zygosity/wadingpool',
+    cndir='results/cnv/ichorcna',
+    genome=config['common']['build'],
+    maxstate=300,
+  conda:
+    "../envs/r.yaml",
+  shell:
+    "Rscript workflow/scripts/wp_zygosity.R "
+    "--hetposf {input.het_pos} "
+    "--hetf {input.het_cnt} "
+    "--cnpath {params.cndir} "
+    "--outdir {params.outdir} "
+    "--genome {params.genome} "
+    "--maxstate {params.maxstate} "
+  
