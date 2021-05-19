@@ -2,7 +2,7 @@ rule collectAllelicCounts:
   input:
     "results/alignment/recal/{sample}.bqsr.bam",
   output:
-    "results/zygosity/counts/{sample}.allelicCounts.tsv",
+    temp("results/zygosity/counts/{sample}.allelicCounts.tsv"),
   conda:
     "../envs/gatk.yaml",
   log:
@@ -65,12 +65,13 @@ rule filtADraw:
   output:
     "results/zygosity/AD/aggregate_filt.csv",
   params:
-    "",
+    samples=expand("{sample}", sample=samples.index),
   conda:
     "../envs/perl.yaml",
   shell:
+    "echo {params.samples} | sed 's/\s/,/g' > {output}; "
     "perl workflow/scripts/allelic_count_helper.pl getlines "
-    "{input.filt_lines} {input.aggregate_raw} > {output}; "
+    "{input.filt_lines} {input.aggregate_raw} >> {output}; "
 
 rule filtADdbsnp:
   input:
