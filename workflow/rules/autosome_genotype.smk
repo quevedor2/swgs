@@ -87,7 +87,7 @@ rule filt_AD_dbsnp:
     "perl workflow/scripts/allelic_count_helper.pl getlines "
     "{input.filt_lines} {params.target} > {output}; "
 
-rule run_wadingpool:
+rule run_wp_zygosity:
   input:
     het_pos='results/zygosity/AD/aggregate_pos.txt',
     het_cnt='results/zygosity/AD/aggregate_filt.csv',
@@ -103,11 +103,30 @@ rule run_wadingpool:
   conda:
     "../envs/r.yaml",
   shell:
-    "Rscript workflow/scripts/wp_zygosity.R "
+    "wp_zygosity.R "
     "--hetposf {input.het_pos} "
     "--hetf {input.het_cnt} "
     "--cnpath {params.cndir} "
     "--outdir {params.outdir} "
     "--genome {params.genome} "
     "--maxstate {params.maxstate} "
-  
+
+rule run_wp_identity_autosome:
+  input:
+    het_cnt='results/zygosity/AD/aggregate_filt.csv',
+  output:
+    pdf=report("results/sampleid/autosome/similarity_autosome.pdf",
+                caption="../report/autoid.rst", category="genotypeID"),
+    tbl=report("results/sampleid/autosome/similarity_autosome.tsv",
+                caption="../report/autoid.rst", category="genotypeID"),
+  params:
+    outdir='results/sampleid',
+    maxstate=0.03,
+  conda:
+    "../envs/r.yaml",
+  shell:
+    "wp_identity.R "
+    "--sample {input.het_cnt} "
+    "--midpoint {params.midpoint} "
+    "--mode autosome "
+    "--outdir {params.outdir} "
