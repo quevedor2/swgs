@@ -42,3 +42,11 @@ ichorcna:
 collect_allelic_counts:
   mem : 20G
   cpus-per-task : 4
+
+run_wp_zygosity:
+  mem : 10G
+  cpus-per-task : 4
+
+run_wp_identity_autosome:
+  mem : 10G
+  cpus-per-task : 4

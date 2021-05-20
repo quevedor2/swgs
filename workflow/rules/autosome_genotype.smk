@@ -92,7 +92,8 @@ rule run_wp_zygosity:
     het_pos='results/zygosity/AD/aggregate_pos.txt',
     het_cnt='results/zygosity/AD/aggregate_filt.csv',
   output:
-    pdfs=expand("results/zygosity/wadingpool/hmmfit_{sample}.pdf", sample=samples.index),
+    pdfs=report(expand("results/zygosity/wadingpool/hmmfit_{sample}.pdf", sample=samples.index),
+                caption="../report/wp_zygosity.rst", category="CNV"),
     tbls=expand("results/zygosity/wadingpool/hmmfit_{sample}.tsv", sample=samples.index),
     rdas=expand("results/zygosity/wadingpool/hmmfit_{sample}.rda", sample=samples.index),
   params:
