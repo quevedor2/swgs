@@ -14,6 +14,6 @@ snakemake --cluster-config slurm/cluster.json \
 --wrapper-prefix /mnt/work1/users/pughlab/references/snakemake-wrappers/ \
 --use-conda \
 --use-singularity \
---jobs 20 
+--jobs 4
 
 
