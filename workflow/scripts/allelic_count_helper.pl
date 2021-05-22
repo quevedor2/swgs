@@ -33,7 +33,7 @@ sub GetCovLines {
 sub CategorizeAD {
   my($dat, $ref_col, $alt_col) = @_;
   
-  my @spl=split(/\t/, $dat);
+  my @spl=split(/\s/, $dat);
   my $ref = $spl[$ref_col];
   my $alt = $spl[$alt_col];
 
@@ -75,7 +75,7 @@ if($analysis eq 'getlines'){
     if($analysis eq 'setlines'){
       my $x = GetCovLines($_, $line, $wild);
     } elsif($analysis eq 'categorize'){
-      my $x = CategorizeAD($_, $line, $wild);
+      my $x = CategorizeAD($_, $wild, $alt_col);
     }
     $line++;
   }

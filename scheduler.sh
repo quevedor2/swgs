@@ -11,9 +11,9 @@ cd /mnt/work1/users/pughlab/bin/swgs
 
 snakemake --cluster-config slurm/cluster.json \
 --profile slurm \
---wrapper-prefix /mnt/work1/users/pughlab/references/snakemake-wrappers/ \
+--wrapper-prefix 'file:///mnt/work1/users/pughlab/references/snakemake-wrappers/' \
 --use-conda \
 --use-singularity \
---jobs 4
+--jobs 5
 
 

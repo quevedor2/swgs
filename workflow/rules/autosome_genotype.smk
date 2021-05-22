@@ -102,7 +102,7 @@ rule run_wp_zygosity:
     genome=config['common']['build'],
     maxstate=300,
   conda:
-    "../envs/r-36.yaml",
+    "../envs/r.yaml",
   shell:
     "wp_zygosity.R "
     "--hetposf {input.het_pos} "
@@ -121,10 +121,10 @@ rule run_wp_identity_autosome:
     tbl=report("results/sampleid/autosome/similarity_autosome.tsv",
                 caption="../report/autoid.rst", category="genotypeID"),
   params:
-    outdir='results/sampleid',
-    maxstate=0.03,
+    outdir='results/sampleid/autosome',
+    midpoint=0.03,
   conda:
-    "../envs/r-36.yaml",
+    "../envs/r.yaml",
   shell:
     "wp_identity.R "
     "--sample {input.het_cnt} "
