@@ -52,7 +52,7 @@ rule indelrealigner:
     output:
         bam="results/alignment/realign/{sample}.bam",
         bai="results/alignment/realign/{sample}.bai",
-        java_temp=temp(directory("/tmp/gatk3_indelrealigner/{sample}")),
+#        java_temp=temp(directory("/tmp/gatk3_indelrealigner/{sample}")),
     log:
         "logs/gatk/indelrealigner/{sample}.log"
     params:

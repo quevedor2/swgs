@@ -10,9 +10,8 @@ dependencies:
  - r-optparse
  - r-ggplot2 ==3.3.0
  - r-reshape2 ==1.4.4
+ - r-ichorcna ==0.2.2
  - r-wadingpool ==0.1.0
- - r-ichorcna ==0.2.1
  - hmmcopy ==0.1.1
  - samtools ==1.12
  - pyyaml ==5.4.1
- #- bioconductor-qdnaseq ==1.26.0

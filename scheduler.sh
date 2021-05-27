@@ -14,6 +14,7 @@ snakemake --cluster-config slurm/cluster.json \
 --wrapper-prefix 'file:///mnt/work1/users/pughlab/references/snakemake-wrappers/' \
 --use-conda \
 --use-singularity \
---jobs 5
+--jobs 5 \
+--rerun-incomplete
 
 

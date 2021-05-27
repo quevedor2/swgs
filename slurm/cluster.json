@@ -11,7 +11,7 @@ bwa_mem:
 indelrealigner:
   mem : 8192
   cpus-per-task : 8
-  time : 4:00:00
+  time : 04:00:00
 
 realigner_target_creator:
   mem : 8192
@@ -24,12 +24,12 @@ mark_duplicates:
 baserecalibrator:
   mem : 8192
   cpus-per-task : 8
-  time : 4:00:00
+  time : 04:00:00
 
 printreads:
   mem : 8192
   cpus-per-task : 8
-  time : 4:00:00
+  time : 04:00:00
 
 collect_multiple_metrics:
   mem : 4096
