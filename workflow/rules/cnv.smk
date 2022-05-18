@@ -4,16 +4,21 @@ rule get_chromosomes:
     output:
         "results/cnv/ichorcna/{sample}.chrs"
     params:
+        conda=config['env']['conda_shell'],
+        env=directory(config['env']['preprocess']),
         read=1000,
         chrpattern="\"^chr[0-9XY]*$\"",
-    conda:
-        "../envs/samtools.yaml"
     shell:
-        "samtools idxstats {input} | "  # returns list of chr and reads
-        "awk '$3 > {params.read}' - | " # remove chromosomes with <1000 reads
-        "cut -f1 | "                    # selects chr column
-        "grep {params.chrpattern} | "   # select chrs 1-22,X,Y
-        "paste -s -d, - > {output}"     # comma-separated concatenation of chrs
+        """
+        source {params.conda} && conda activate {params.env};
+        
+        samtools idxstats {input} | \  # returns list of chr and reads
+        awk '$3 > {params.read}' - | \ # remove chromosomes with <1000 reads
+        cut -f1 | \                    # selects chr column
+        grep {params.chrpattern} | \   # select chrs 1-22,X,Y
+        paste -s -d, - > {output} 2> {log}    # comma-separated concatenation of chrs
+        """
+        
 
 rule readcounter:
     input:
@@ -23,20 +28,25 @@ rule readcounter:
     output:
         temp("results/cnv/ichorcna/{sample}.wig"),
     params:
+        conda=config['env']['conda_shell'],
+        env=directory(config['env']['preprocess']),
         window=config['params']['readcounter']['window'],
         quality=config['params']['readcounter']['quality'],
     log:
         "logs/cnv/ichorcna/{sample}_readcounter.log"
-    conda:
-        "../envs/r.yaml"
     shell:
-        "readCounter "
-        "--window {params.window} "
-        "--quality {params.quality} "
-        "--chromosome $(cat {input.chrs}) "
-        "{input.bam} | "
-        "sed \"s/chrom=chr/chrom=/\" "
-        "> {output} 2> {log}"
+        """
+        source {params.conda} && conda activate {params.env};
+        
+        readCounter \
+        --window {params.window} \
+        --quality {params.quality} \
+        --chromosome $(cat {input.chrs}) \
+        {input.bam} | \
+        sed \"s/chrom=chr/chrom=/\" \
+        > {output} 2> {log}
+        """
+        
 
 rule get_RlibPath:
     output:

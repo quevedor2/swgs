@@ -6,12 +6,25 @@ rule mark_duplicates:
     metrics="results/alignment/dedup/{sample}.metric.txt"
   log:
     "logs/picard/dedup/{sample}.log"
-  threads: 8
   params:
-    "REMOVE_DUPLICATES=true",
-    "ASSUME_SORT_ORDER='coordinate'"
-  wrapper:
-    "0.73.0/bio/picard/markduplicates"
+    conda=config['env']['conda_shell'],
+    env=directory(config['env']['preprocess']),
+    mem=config['mem']['markduplicates'],
+    rmduplicates="true",
+    sort='coordinate',
+  shell:
+    """
+    source {params.conda} && conda activate {params.env};
+    
+    picard MarkDuplicates \
+    -Xmx{params.mem}G \
+    REMOVE_DUPLICATES={params.rmduplicates},
+    ASSUME_SORT_ORDER={params.sort},
+    {input} \
+    --OUTPUT {output.bam} \
+    --METRICS_FILE {output.metrics} 2> {log}
+    """
+    
 
 rule index_duplicates:
   input:
@@ -20,34 +33,59 @@ rule index_duplicates:
     "results/alignment/dedup/{sample}.bam.bai"
   log:
     "logs/samtools/index/{sample}.log"
-  wrapper:
-    "0.73.0/bio/samtools/index"
+  threads: 1
+  params:
+    conda=config['env']['conda_shell'],
+    env=directory(config['env']['preprocess']),
+    extra="",
+  shell:
+    """
+    source {params.conda} && conda activate {params.env};
+    
+    samtools index \
+    {threads} \
+    {params.extra} \
+    {input} \
+    {output} 2> {log}
+    """
 
 rule realigner_target_creator:
     input:
         bam="results/alignment/dedup/{sample}.bam",
         bai=rules.index_duplicates.output,
         ref=config['common']['genome'],
-        known=get_snp_paths
     output:
         intervals="results/alignment/realign/{sample}.intervals",
         java_temp=temp(directory("gatk3_indelrealigner/{sample}")),
     log:
         "logs/gatk/indelrealigner/{sample}.realignertargetcreator.log",
     params:
-        extra="", # optional
+        conda=config['env']['conda_shell'],
+        env=directory(config['env']['preprocess']),
+        extra="", # optional (e.g. -L bedfile.bed)
+        known=get_snp_paths,
     resources:
         mem_mb=8192,
     threads: 8
-    wrapper:
-        "0.73.0/bio/gatk3/realignertargetcreator"
+    shell:
+        """
+        source {params.conda} && conda activate {params.env};
+        
+        gatk3 Xmx{resources.mem_mb}M \
+        -T RealignerTargetCreator \
+        -nt {threads} \
+        {params.extra} \
+        -I {input.bam} \
+        -R {input.ref} \
+        -known {params.known} \
+        -o {output.intervals} 2> {log}
+        """
 
 rule indelrealigner:
     input:
         bam="results/alignment/dedup/{sample}.bam",
         bai="results/alignment/dedup/{sample}.bam.bai",
         ref=config['common']['genome'],
-        known=get_indel_paths,
         target_intervals="results/alignment/realign/{sample}.intervals"
     output:
         bam="results/alignment/realign/{sample}.bam",
@@ -56,29 +94,57 @@ rule indelrealigner:
     log:
         "logs/gatk/indelrealigner/{sample}.log"
     params:
-        extra=""  # optional
+        conda=config['env']['conda_shell'],
+        env=directory(config['env']['preprocess']),
+        extra="",  # optional
+        known=get_indel_paths,
     threads: 8
     resources:
         mem_mb = 8192
-    wrapper:
-        "0.73.0/bio/gatk3/indelrealigner"
+    shell:
+        """
+        source {params.conda} && conda activate {params.env};
+        
+        gatk3 -Xmx{resources.mem_mb}M \
+        -T IndelRealigner \
+        {params.extra} \
+        -I {input.bam} \
+        -R {input.ref} \
+        -known {params.known} \
+        --targetIntervals {input.target_intervals} \
+        -o {output.bam} 2> {log}
+        """
 
 rule baserecalibrator:
     input:
         bam="results/alignment/realign/{sample}.bam",
         ref=config['common']['genome'],
-        known=get_indel_paths
     output:
         "results/alignment/recal/{sample}.recal_data_table"
     log:
         "logs/gatk/bqsr/{sample}.recal.log",
     params:
+        conda=config['env']['conda_shell'],
+        env=directory(config['env']['preprocess']),
         extra=combine_args(config["params"]["gatk"]["baserecalibrator"]),
+        known=get_indel_paths,
     resources:
         mem_mb = 8192
     threads: 8
-    wrapper:
-        "0.73.0/bio/gatk3/baserecalibrator"
+    shell:
+        """
+        source {params.conda} && conda activate {params.env};
+        
+        gatk3 -Xmx{resources.mem_mb}M \
+        -T BaseRecalibrator \
+        -nct {threads} \
+        {params.extra} \
+        -I {input.bam} \
+        -R {input.ref} \
+        --knownSites {params.known} \
+        -o {output} 2> {log}
+        """
+        
 
 rule printreads:
     input:
@@ -90,12 +156,24 @@ rule printreads:
     log:
         "logs/gatk/bqsr/{sample}.print.log"
     params:
+        conda=config['env']['conda_shell'],
+        env=directory(config['env']['preprocess']),
         extra=combine_args(config["params"]["gatk"]["printreads"]),
     resources:
         mem_mb = 8192
     threads: 8
-    wrapper:
-        "0.73.0/bio/gatk3/printreads"
+    shell:
+        """
+        source {params.conda} && conda activate {params.env};
+        
+        gatk3 -Xmx{resources.mem_mb}M \
+        -T PrintReads \
+        {params.extra} \
+        -I {input.bam} \
+        -R {input.ref} \
+        -BQSR {input.recal_data} \
+        -o {output} 2> {log}
+        """
 
 rule symlink_bai:
     input:

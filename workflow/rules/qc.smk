@@ -19,12 +19,32 @@ rule collect_multiple_metrics:
     log:
         "logs/picard/multiple_metrics/{sample}.log"
     params:
+        conda=config['env']['conda_shell'],
+        env=directory(config['env']['preprocess']),
+        out="{sample}",
         # optional parameters
-        "VALIDATION_STRINGENCY=LENIENT "
-        "METRIC_ACCUMULATION_LEVEL=null "
-        "METRIC_ACCUMULATION_LEVEL=SAMPLE "
-    wrapper:
-        "0.73.0/bio/picard/collectmultiplemetrics"
+        extra="""
+        VALIDATION_STRINGENCY=LENIENT
+        METRIC_ACCUMULATION_LEVEL=null
+        METRIC_ACCUMULATION_LEVEL=SAMPLE
+        """
+    shell:
+        """
+        source {params.conda} && conda activate {params.env};
+
+        picard CollectMultipleMetrics \
+        -Xmx{resources.mem_gb}G \
+        {params.extra} \
+        --INPUT {input.bam} \
+        --OUTPUT {params.out} \
+        --REFERENCE_SEQUENCE {input.ref} \
+        PROGRAM=null \
+        PROGRAM=CollectAlignmentSummaryMetrics \
+        PROGRAM=CollectInsertSizeMetrics \
+        PROGRAM=QualityScoreDistribution \
+        PROGRAM=CollectGcBiasMetrics \
+        PROGRAM=CollectQualityYieldMetrics 2> {log}
+        """
 
 rule collect_wgs_metrics:
     input:
@@ -34,13 +54,20 @@ rule collect_wgs_metrics:
         "results/qc/{sample}.wgs_metrics"
     log:
         "logs/picard/wgs_metrics/{sample}.log"
-    conda:
+    params:
+        conda=config['env']['conda_shell'],
+        env=directory(config['env']['preprocess']),
         "../envs/picard.yaml"
     shell:
-        "picard CollectWgsMetrics "
-        "I={input.bam} "
-        "O={output} "
-        "R={input.ref} 2> {log}"
+        """
+        source {params.conda} && conda activate {params.env};
+        
+        picard CollectWgsMetrics \
+        I={input.bam} \
+        O={output} \
+        R={input.ref} 2> {log}
+        """
+        
 
 rule plot_wgs_insert:
     input:
@@ -49,12 +76,18 @@ rule plot_wgs_insert:
     output:
         report("results/plots/qc/wgs_insert_metrics.pdf", caption="../report/qc.rst", category='QC'),
     params:
+        conda=config['env']['conda_shell'],
+        env=directory(config['env']['R']),
         qcdir="results/qc",
         samples=",".join(expand("{sample}", sample=samples.index)),
     conda:
         "../envs/r.yaml"
     shell:
-        "Rscript workflow/scripts/plot_picard_metrics.R "
-        "--qcdir {params.qcdir} "
-        "--samples {params.samples} "
-        "--output {output}"
+        """
+        source {params.conda} && conda activate {params.env};
+        
+        Rscript scripts/plot_picard_metrics.R \
+        --qcdir {params.qcdir} \
+        --samples {params.samples} \
+        --output {output}"
+        """

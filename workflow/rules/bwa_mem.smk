@@ -7,20 +7,39 @@ rule bwa_mem:
     "logs/bwa_mem/{sample}.log"
   threads: 8
   params:
+    conda=config['env']['conda_shell'],
+    env=directory(config['env']['preprocess']),
     index=config['params']['bwa']['mem']['genome'],
     extra=get_rgid,
-    sort="samtools",
-    sort_order="coordinate"
-  wrapper:
-    "0.73.0/bio/bwa/mem"
-
+  shell:
+    """
+    source {params.conda} && conda activate {params.env};
+    
+    bwa mem \
+    -t {threads} \
+    {params.extra} \
+    {params.index} \
+    {input.reads} | \
+    samtools sort -o {output} - 2> {log}
+    """
 
 rule samtools_index:
   input:
     "results/alignment/mapped_reads/{sample}.sorted.bam"
   output:
     "results/alignment/mapped_reads/{sample}.sorted.bam.bai"
+  threads: 1
   params:
-    ""
-  wrapper:
-    "0.73.0/bio/samtools/index"
+    conda=config['env']['conda_shell'],
+    env=directory(config['env']['preprocess']),
+    extra="",
+  shell:
+    """
+    source {params.conda} && conda activate {params.env};
+    
+    samtools index \
+    {threads} \
+    {params.extra} \
+    {input} \
+    {output} 2> {log}
+    """
