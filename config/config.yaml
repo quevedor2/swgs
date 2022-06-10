@@ -8,10 +8,17 @@ common:
   build: 'hg19'
   genome: '/mnt/work1/data/genomes/human/hg19/iGenomes/Sequence/WholeGenomeFasta/genome.fa'
 
+env:
+  conda_shell: "~/miniconda3/etc/profile.d/conda.sh"
+  preprocess: "/cluster/projects/mcgahalab/envs/preprocess"
+  richor: "/cluster/projects/mcgahalab/envs/richor"
+
 params:
+  mem:
+    markduplicates: 10
   bwa:
     mem:
-      genome: '/mnt/work1/data/genomes/human/hg19/iGenomes/Sequence/BWAIndex/genome.fa'
+      genome: '/cluster/projects/mcgahalab/ref/genomes/human/GRCh38/BWAIndex/genome.fasta'
   gatk:
     baserecalibrator:
       - "-rf BadCigar"
