@@ -16,12 +16,14 @@ rule mark_duplicates:
     """
     source {params.conda} && conda activate {params.env};
     
-    picard MarkDuplicates \
+    java  \
     -Xmx{params.mem}G \
-    REMOVE_DUPLICATES={params.rmduplicates},
-    ASSUME_SORT_ORDER={params.sort},
-    {input} \
-    --OUTPUT {output.bam} \
+    -jar {params.env}/share/picard-2.27.2-0/picard.jar \
+    MarkDuplicates \
+    --REMOVE_DUPLICATES {params.rmduplicates} \
+    --ASSUME_SORT_ORDER {params.sort} \
+    -I {input} \
+    -O {output.bam} \
     --METRICS_FILE {output.metrics} 2> {log}
     """
     
@@ -117,7 +119,8 @@ rule indelrealigner:
 
 rule baserecalibrator:
     input:
-        bam="results/alignment/realign/{sample}.bam",
+        #bam="results/alignment/realign/{sample}.bam",
+        bam="results/alignment/dedup/{sample}.bam",
         ref=config['common']['genome'],
     output:
         "results/alignment/recal/{sample}.recal_data_table"
@@ -135,18 +138,17 @@ rule baserecalibrator:
         """
         source {params.conda} && conda activate {params.env};
         
-        gatk3 -Xmx{resources.mem_mb}M \
-        -T BaseRecalibrator \
-        -nct {threads} \
+        gatk \
+        BaseRecalibrator \
         {params.extra} \
         -I {input.bam} \
         -R {input.ref} \
         --knownSites {params.known} \
-        -o {output} 2> {log}
+        -O {output} 2> {log}
         """
         
 
-rule printreads:
+rule applybqsr:
     input:
         bam="results/alignment/realign/{sample}.bam",
         ref=config['common']['genome'],
@@ -166,12 +168,12 @@ rule printreads:
         """
         source {params.conda} && conda activate {params.env};
         
-        gatk3 -Xmx{resources.mem_mb}M \
-        -T PrintReads \
+        gatk \
+        ApplyBQSR \
         {params.extra} \
         -I {input.bam} \
         -R {input.ref} \
-        -BQSR {input.recal_data} \
+        --bqsr-recal-file {input.recal_data} \
         -o {output} 2> {log}
         """
 

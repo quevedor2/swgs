@@ -14,6 +14,10 @@ def get_ichorPath(rlib_path, config):
         cen_file = 'GRCh37.p13_centromere_UCSC-gapTable.txt'
     elif config['common']['build'] == 'hg38':
         cen_file = 'GRCh38.GCA_000001405.2_centromere_acen.txt'
+    elif config['common']['build'] == 'GRCh38':
+        cen_file = 'GRCh38.GCA_000001405.2_centromere_acen.txt'
+    elif config['common']['build'] == 'GRCh37':
+        cen_file = 'GRCh37.p13_centromere_UCSC-gapTable.txt'
         #cen_file = 'cytoBand_hg38'
     
     # Get the 500kb or 1Mb window annotation

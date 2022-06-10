@@ -7,13 +7,13 @@ rule get_chromosomes:
         conda=config['env']['conda_shell'],
         env=directory(config['env']['preprocess']),
         read=1000,
-        chrpattern="\"^chr[0-9XY]*$\"",
+        chrpattern="\"^[0-9XY]*$\"", # "\"^chr[0-9XY]*$\"", for hg38
     shell:
         """
         source {params.conda} && conda activate {params.env};
         
         samtools idxstats {input} | \  # returns list of chr and reads
-        awk '$3 > {params.read}' - | \ # remove chromosomes with <1000 reads
+        awk '$3>{params.read}' - | \   # remove chromosomes with <1000 reads
         cut -f1 | \                    # selects chr column
         grep {params.chrpattern} | \   # select chrs 1-22,X,Y
         paste -s -d, - > {output} 2> {log}    # comma-separated concatenation of chrs
@@ -29,7 +29,7 @@ rule readcounter:
         temp("results/cnv/ichorcna/{sample}.wig"),
     params:
         conda=config['env']['conda_shell'],
-        env=directory(config['env']['preprocess']),
+        env=directory(config['env']['richor']),
         window=config['params']['readcounter']['window'],
         quality=config['params']['readcounter']['quality'],
     log:
